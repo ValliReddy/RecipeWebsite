@@ -1,7 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import CommentCard from './Comments'; // Import the CommentCard component
 
 const Biryani = () => {
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+
+  const toggleComment = () => {
+    setIsCommentOpen(!isCommentOpen);
+  };
+
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -50,11 +57,21 @@ const Biryani = () => {
             <li>Cover the pot with a tight-fitting lid and cook on low heat for 15-20 minutes until the rice is fully cooked and aromatic.</li>
             <li>Once done, fluff the biryani gently with a fork. Garnish with the reserved fried onions and serve hot with raita or salad.</li>
           </ol>
-</div>
+          </div>
+          </div>
+      <div className="recipe-actions">
+        <button className="recipe" onClick={handlePrint}>
+          Print Recipe
+        </button>
+        {/* Button to toggle comment visibility */}
+        <button className="leave-comment" onClick={toggleComment}>
+          {isCommentOpen ? 'Leave a Comment' : 'Leave a Comment'}
+        </button>
       </div>
-      <button onClick={handlePrint}>Print Recipe</button>
+      {/* Include the CommentCard component */}
+      <CommentCard isOpen={isCommentOpen} />
     </div>
-    
+
   );
 };
 
