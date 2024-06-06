@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 
-const CommentSection = () => {
-  const [comment, setComment] = useState('');
-  const [rating, setRating] = useState(0);
 
+const CommentSection = () => {
+  const [rating, setRating] = useState(0);
+  const [name, setName] = useState(''); // State for the user's name
+  const [comment, setComment] = useState(''); // State for the comment text
+  const [email, setEmail] = useState(''); // State for the email
+
+  // Handle star click to set rating
   const handleStarClick = (value) => {
     setRating(value);
   };
 
+  // Handle form submission
   const handleSubmitComment = (e) => {
     e.preventDefault();
-    // Here you can handle submitting the comment and rating to the server
-    // Reset the form fields and rating after submission
+    // Handle form submission here, including the name, email, comment, and rating
+    console.log({
+      name,
+      email,
+      comment,
+      rating
+    });
+    // Reset the form after submission
+    setName('');
+    setEmail('');
     setComment('');
     setRating(0);
   };
@@ -20,15 +33,29 @@ const CommentSection = () => {
     <div className="comment-section">
       <form className="comment-form" onSubmit={handleSubmitComment}>
         <div className="form-group">
-          <label htmlFor="comment">Comment <span className="required">*</span></label>
+          <label>Name:</label>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            required 
+          />
+        </div>
+        <div className="form-group">
+          <label>Email:</label>
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+          />
+        </div>
+        <div className="form-group">
+          <label>Comment:</label>
           <textarea 
-            id="comment" 
-            name="comment" 
-            cols="30" 
-            rows="5" 
-            required
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={comment} 
+            onChange={(e) => setComment(e.target.value)} 
+            required 
           ></textarea>
         </div>
         <div className="form-group">
@@ -40,36 +67,16 @@ const CommentSection = () => {
                 className={value <= rating ? 'active' : ''}
                 onClick={() => handleStarClick(value)}
               >
-                &#9733;
+                ★
               </span>
             ))}
           </div>
-        </div>
-        <div className="form-group">
-          <label htmlFor="name">Name <span className="required">*</span></label>
-          <input 
-            type="text" 
-            id="name" 
-            name="name" 
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email <span className="required">*</span></label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            required 
-          />
         </div>
         <button type="submit" className="submit-comment">Post Comment</button>
       </form>
     </div>
   );
 };
-
-
 
 const CommentCard = ({ isOpen }) => {
   return (
