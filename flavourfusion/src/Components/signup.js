@@ -1,150 +1,135 @@
-// SignUp.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './SignUp.css'; // Import the CSS file
+import axios from 'axios';
 
 
-const SignUp = () => {
-  const [activeTab, setActiveTab] = useState('signup');
+const SignUpForm = () => {
+  const [formFields, setFormFields] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [highlightedFields, setHighlightedFields] = useState({});
 
-  useEffect(() => {
-    const handleInput = (e) => {
-      const $this = e.target;
-      const label = $this.previousElementSibling;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      [name]: value,
+    }));
+    setHighlightedFields((prevFields) => ({
+      ...prevFields,
+      [name]: value !== '',
+    }));
+  };
 
-      if (e.type === 'keyup') {
-        if ($this.value === '') {
-          label.classList.remove('active', 'highlight');
-        } else {
-          label.classList.add('active', 'highlight');
-        }
-      } else if (e.type === 'blur') {
-        if ($this.value === '') {
-          label.classList.remove('active', 'highlight');
-        } else {
-          label.classList.remove('highlight');
-        }
-      } else if (e.type === 'focus') {
-        if ($this.value === '') {
-          label.classList.remove('highlight');
-        } else {
-          label.classList.add('highlight');
-        }
-      }
-    };
+  const handleFocus = (e) => {
+    const { name } = e.target;
+    setHighlightedFields((prevFields) => ({
+      ...prevFields,
+      [name]: true,
+    }));
+  };
 
-    const handleTabClick = (e) => {
-      e.preventDefault();
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setHighlightedFields((prevFields) => ({
+      ...prevFields,
+      [name]: value !== '',
+    }));
+  };
 
-      const tab = e.currentTarget.parentElement;
-      const target = e.currentTarget.getAttribute('href');
+  const submitHandler = (e) => {
+    e.preventDefault();
+    axios.post("http://localhost:5000/register", formFields)
+      .then(res => {
+        alert(res.data);
+        // Clear form fields
+        setFormFields({
+          username: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
 
-      tab.classList.add('active');
-      [...tab.parentElement.children].forEach((sibling) => {
-        if (sibling !== tab) {
-          sibling.classList.remove('active');
-        }
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        // Handle registration error, show error message, etc.
       });
-
-      document.querySelectorAll('.tab-content > div').forEach((content) => {
-        if (`#${content.id}` === target) {
-          content.style.display = 'block';
-        } else {
-          content.style.display = 'none';
-        }
-      });
-    };
-
-    document.querySelectorAll('.form input, .form textarea').forEach((el) => {
-      el.addEventListener('keyup', handleInput);
-      el.addEventListener('blur', handleInput);
-      el.addEventListener('focus', handleInput);
-    });
-
-    document.querySelectorAll('.tab a').forEach((el) => {
-      el.addEventListener('click', handleTabClick);
-    });
-
-    // Clean up event listeners
-    return () => {
-      document.querySelectorAll('.form input, .form textarea').forEach((el) => {
-        el.removeEventListener('keyup', handleInput);
-        el.removeEventListener('blur', handleInput);
-        el.removeEventListener('focus', handleInput);
-      });
-
-      document.querySelectorAll('.tab a').forEach((el) => {
-        el.removeEventListener('click', handleTabClick);
-      });
-    };
-  }, []);
+  };
 
   return (
     <div className="form">
-      <ul className="tab-group">
-        <li className={`tab ${activeTab === 'signup' ? 'active' : ''}`} onClick={() => setActiveTab('signup')}>
-          <a href="#signup">Sign Up</a>
-        </li>
-        <li className={`tab ${activeTab === 'login' ? 'active' : ''}`} onClick={() => setActiveTab('login')}>
-          <a href="#login">Log In</a>
-        </li>
-      </ul>
-
-      <div className="tab-content">
-        <div id="signup" style={{ display: activeTab === 'signup' ? 'block' : 'none' }}>
-          <h1>Sign Up for Free</h1>
-          <form action="/" method="post">
-            <div className="top-row">
-              <div className="field-wrap">
-                <label>
-                  First Name<span className="req">*</span>
-                </label>
-                <input type="text" required autoComplete="off" />
-              </div>
-              <div className="field-wrap">
-                <label>
-                  Last Name<span className="req">*</span>
-                </label>
-                <input type="text" required autoComplete="off" />
-              </div>
-            </div>
-            <div className="field-wrap">
-              <label>
-                Email Address<span className="req">*</span>
-              </label>
-              <input type="email" required autoComplete="off" />
-            </div>
-            <div className="field-wrap">
-              <label>
-                Set A Password<span className="req">*</span>
-              </label>
-              <input type="password" required autoComplete="off" />
-            </div>
-            <button type="submit" className="button button-block">Get Started</button>
-          </form>
+      <h1>Sign Up for Free</h1>
+      <form onSubmit={submitHandler}>
+        <div className="top-row">
+          <div className={`field-wrap ${highlightedFields.username ? 'highlight' : ''}`}>
+            <label className={formFields.username ? 'active' : ''}>
+              Username<span className="req">*</span>
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formFields.username}
+              onChange={handleInputChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              required
+              autoComplete="off"
+            />
+          </div>
+          <div className={`field-wrap ${highlightedFields.email ? 'highlight' : ''}`}>
+            <label className={formFields.email ? 'active' : ''}>
+              Email Address<span className="req">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formFields.email}
+              onChange={handleInputChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              required
+              autoComplete="off"
+            />
+          </div>
         </div>
-
-        <div id="login" style={{ display: activeTab === 'login' ? 'block' : 'none' }}>
-          <h1>Welcome Back!</h1>
-          <form action="/" method="post">
-            <div className="field-wrap">
-              <label>
-                Email Address<span className="req">*</span>
-              </label>
-              <input type="email" required autoComplete="off" />
-            </div>
-            <div className="field-wrap">
-              <label>
-                Password<span className="req">*</span>
-              </label>
-              <input type="password" required autoComplete="off" />
-            </div>
-            <p className="forgot"><a href="#">Forgot Password?</a></p>
-            <button className="button button-block">Log In</button>
-          </form>
+        <div className={`field-wrap ${highlightedFields.password ? 'highlight' : ''}`}>
+          <label className={formFields.password ? 'active' : ''}>
+            Password<span className="req">*</span>
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formFields.password}
+            onChange={handleInputChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            required
+            autoComplete="off"
+          />
         </div>
-      </div>
+        <div className={`field-wrap ${highlightedFields.confirmPassword ? 'highlight' : ''}`}>
+          <label className={formFields.confirmPassword ? 'active' : ''}>
+            Confirm Password<span className="req">*</span>
+          </label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formFields.confirmPassword}
+            onChange={handleInputChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            required
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="button button-block">Get Started</button>
+      </form>
     </div>
   );
 };
 
-export default SignUp;
+export default SignUpForm;
