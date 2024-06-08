@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './SignUp.css'; // Import the CSS file
 import axios from 'axios';
+import { store } from '../App';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const [token, setToken] = useContext(store);
   const [formFields, setFormFields] = useState({
     email: '',
     password: '',
   });
   const [highlightedFields, setHighlightedFields] = useState({});
+  const [error, setError] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,18 +46,23 @@ const LoginForm = () => {
     e.preventDefault();
     axios.post("http://localhost:5000/login", formFields)
       .then(res => {
-        alert('Login successful!');
+        setToken(res.data.token);
+        localStorage.setItem('token', res.data.token); // Store token in local storage
         // Clear form fields
         setFormFields({
           email: '',
           password: '',
         });
+        // Redirect to myprofile page
+        navigate('/myprofile');
       })
       .catch(err => {
         console.error(err);
-        // Handle login error, show error message, etc.
+        // Display error message to the user
+        setError("Invalid email or password. Please try again.");
       });
   };
+
   return (
     <div className="form">
       <h1>Welcome Back!</h1>
@@ -87,6 +97,7 @@ const LoginForm = () => {
             autoComplete="off"
           />
         </div>
+        {error && <p className="error">{error}</p>}
         <p className="forgot"><a href="#">Forgot Password?</a></p>
         <button type="submit" className="button button-block">Log In</button>
       </form>
