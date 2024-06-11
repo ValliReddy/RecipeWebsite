@@ -1,55 +1,56 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { store } from '../App';
 
 
 const CommentSection = () => {
   const [rating, setRating] = useState(0);
-  const [name, setName] = useState(''); // State for the user's name
-  const [comment, setComment] = useState(''); // State for the comment text
-  const [email, setEmail] = useState(''); // State for the email
+  const [comment, setComment] = useState('');
+  const navigate = useNavigate();
+  const [token] = useContext(store); 
+  const [commentId,setCommentId]=useState('');
 
-  // Handle star click to set rating
   const handleStarClick = (value) => {
     setRating(value);
   };
 
-  // Handle form submission
-  const handleSubmitComment = (e) => {
+  const handleSubmitComment = async (e) => {
     e.preventDefault();
-    // Handle form submission here, including the name, email, comment, and rating
-    console.log({
-      name,
-      email,
-      comment,
-      rating
-    });
-    // Reset the form after submission
-    setName('');
-    setEmail('');
-    setComment('');
-    setRating(0);
+    try {
+      let storedToken = token || localStorage.getItem('token'); // Retrieve token from context or local storage
+      if (!storedToken) {
+        navigate('/login'); // If token is not available, redirect to login page
+        return;
+      }
+
+      // Send comment data to the server with authentication and postId
+      const response = await axios.post('http://localhost:5000/comments', {
+        content: comment,
+        rating: rating,
+     
+      }, {
+        headers: {
+          'x-token': storedToken // Include token in request headers
+        }
+      });
+
+      const { commentId } = response.data; // Extract the commentId from the response
+      setCommentId(commentId);
+      console.log(commentId)
+      // Reset form after successful submission
+      setComment('');
+      setRating(0);
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
   };
 
   return (
     <div className="comment-section">
       <form className="comment-form" onSubmit={handleSubmitComment}>
-        <div className="form-group">
-          <label>Name:</label>
-          <input 
-            type="text" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label>Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
-        </div>
+        
         <div className="form-group">
           <label>Comment:</label>
           <textarea 
@@ -78,12 +79,19 @@ const CommentSection = () => {
   );
 };
 
-const CommentCard = ({ isOpen }) => {
+
+
+
+
+const CommentCard = ({ isOpen,commentId}) => {
   return (
     <div className={`comment-card ${isOpen ? 'open' : ''}`}>
       {isOpen && <CommentSection />}
+    
     </div>
   );
 };
+
+
 
 export default CommentCard;
