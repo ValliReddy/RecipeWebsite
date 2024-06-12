@@ -1,6 +1,9 @@
 .App {
   text-align: center;
 }
+.star {
+  color: gold; /* or any other gold color you prefer */
+}
 
 .star-rating {
   display: inline-block;

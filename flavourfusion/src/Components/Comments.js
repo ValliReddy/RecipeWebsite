@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { store } from '../App';
+import CommentDisplay from './DisplayComments';
 
 
 const CommentSection = () => {
@@ -35,7 +36,7 @@ const CommentSection = () => {
           'x-token': storedToken // Include token in request headers
         }
       });
-
+      console.log(response.data)
       const { commentId } = response.data; // Extract the commentId from the response
       setCommentId(commentId);
       console.log(commentId)
@@ -74,24 +75,23 @@ const CommentSection = () => {
           </div>
         </div>
         <button type="submit" className="submit-comment">Post Comment</button>
+        <CommentDisplay postId={commentId} />
       </form>
     </div>
   );
 };
 
 
+// const CommentCard = ({ isOpen, commentId }) => {
+//   return (
+//     <div className={`comment-card ${isOpen ? 'open' : ''}`}>
+//       {isOpen && <CommentSection />}
+//       <CommentDisplay postId={commentId} />
+//     </div>
+//   );
+// };
+
+export default CommentSection;
 
 
 
-const CommentCard = ({ isOpen,commentId}) => {
-  return (
-    <div className={`comment-card ${isOpen ? 'open' : ''}`}>
-      {isOpen && <CommentSection />}
-    
-    </div>
-  );
-};
-
-
-
-export default CommentCard;

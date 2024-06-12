@@ -1,13 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef} from 'react';
 import { useReactToPrint } from 'react-to-print';
-import CommentCard from './Comments'; // Import the CommentCard component
+import CommentSection from './Comments'; // Import the CommentCard component
 
 const Biryani = () => {
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
-
-  const toggleComment = () => {
-    setIsCommentOpen(!isCommentOpen);
-  };
 
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
@@ -64,12 +59,9 @@ const Biryani = () => {
           Print Recipe
         </button>
         {/* Button to toggle comment visibility */}
-        <button className="leave-comment" onClick={toggleComment}>
-          {isCommentOpen ? 'Leave a Comment' : 'Leave a Comment'}
-        </button>
+        <h2>Leave a comment</h2>
+        <CommentSection/>
       </div>
-      {/* Include the CommentCard component */}
-      <CommentCard isOpen={isCommentOpen} />
     </div>
 
   );
