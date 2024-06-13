@@ -11,15 +11,15 @@ const CommentDisplay = ({ postId }) => {
         const response = await axios.get(`http://localhost:5000/comments/${postId}`);
         const fetchedComments = response.data;
 
-        // Filter out comments that are already present
+      
         const newComments = fetchedComments.filter(comment => !commentIds.includes(comment._id));
 
-        // Update commentIds and setComments
+       
         const updatedCommentIds = [...commentIds, ...newComments.map(comment => comment._id)];
         setCommentIds(updatedCommentIds);
         setComments(prevComments => [...prevComments, ...newComments]);
 
-        // Update localStorage with only unique comments
+       
         localStorage.setItem('comments', JSON.stringify(comments.concat(newComments)));
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -27,7 +27,7 @@ const CommentDisplay = ({ postId }) => {
     };
 
     fetchComments();
-  }, [postId]); // Fetch comments only when postId changes
+  }, [postId]); 
 
   useEffect(() => {
     const storedComments = localStorage.getItem('comments');
@@ -38,7 +38,7 @@ const CommentDisplay = ({ postId }) => {
       setCommentIds(uniqueCommentIds);
       setComments(parsedComments);
     }
-  }, []); // Load comments only on component mount
+  }, []); 
 
   const renderStars = (rating) => {
     const stars = [];

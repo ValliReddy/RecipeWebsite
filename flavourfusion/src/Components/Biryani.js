@@ -1,6 +1,6 @@
 import React, { useRef} from 'react';
 import { useReactToPrint } from 'react-to-print';
-import CommentSection from './Comments'; // Import the CommentCard component
+import CommentSection from './Comments';
 
 const Biryani = () => {
 

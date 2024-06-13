@@ -20,27 +20,27 @@ const CommentSection = () => {
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     try {
-      let storedToken = token || localStorage.getItem('token'); // Retrieve token from context or local storage
+      let storedToken = token || localStorage.getItem('token'); 
       if (!storedToken) {
-        navigate('/login'); // If token is not available, redirect to login page
+        navigate('/login'); 
         return;
       }
 
-      // Send comment data to the server with authentication and postId
+    
       const response = await axios.post('http://localhost:5000/comments', {
         content: comment,
         rating: rating,
      
       }, {
         headers: {
-          'x-token': storedToken // Include token in request headers
+          'x-token': storedToken 
         }
       });
       console.log(response.data)
-      const { commentId } = response.data; // Extract the commentId from the response
+      const { commentId } = response.data; 
       setCommentId(commentId);
       console.log(commentId)
-      // Reset form after successful submission
+  
       setComment('');
       setRating(0);
     } catch (error) {
