@@ -1,19 +1,36 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const RecipeForm = ({ open, setCloseForm }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
     const [image, setImage] = useState(null);
+    const [recipeID,setrecipeID]=useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log('Recipe Name:', recipeName);
-        console.log('Ingredients:', ingredients);
-        console.log('Instructions:', instructions);
-        console.log('Image:', image); // Handle image upload logic here
-        // Example of handling close after form submission
-        setCloseForm(false);
+        const formData = new FormData();
+        formData.append('recipeName', recipeName);
+        formData.append('ingredients', ingredients);
+        formData.append('instructions', instructions);
+        if (image) {
+            formData.append('recipeImage', image);
+        }
+
+        try {
+            const response = await axios.post('http://localhost:5000/submit-recipe', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log(response.data);
+            setrecipeID(response.data.recipe._id);
+            console.log('Recipe ID:', response.data.recipe._id);
+            setCloseForm(false);
+        } catch (error) {
+            console.error('Error submitting recipe:', error);
+        }
     };
 
     const handleImageChange = (event) => {

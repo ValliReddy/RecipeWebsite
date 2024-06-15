@@ -26,12 +26,12 @@ const MainContent = () => {
 									<span class="image">
 										<img src="images/onion_fries.jpg" alt="" />
 									</span>
-									<a href="generic.html">
+									<Link to="/all">
 										<h2>Onion Fries</h2>
 										<div class="content">
 											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
 										</div>
-									</a>
+									</Link>
 								</article>
 								<article class="style3">
 									<span class="image">

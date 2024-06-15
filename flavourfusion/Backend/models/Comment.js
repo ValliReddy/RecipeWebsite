@@ -6,6 +6,11 @@ const CommentSchema = new mongoose.Schema({
     ref: 'RegisterUser',
     required: true
   },
+  recipe: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RecipeSchema',
+    required: false
+  },
   content: {
     type: String,
     required: true
@@ -24,3 +29,6 @@ const CommentSchema = new mongoose.Schema({
 
 
 module.exports = mongoose.model('Comment', CommentSchema);
+
+
+

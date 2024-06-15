@@ -10,6 +10,7 @@ import Login from './Components/Login';
 import Biryani from './Components/Biryani';
 import { createContext } from 'react';
 import MyProfile from './Components/myprofile';
+import All from './Components/AllRecipe';
 
 export const store = createContext();
 const App = () => {
@@ -33,6 +34,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/biryani" element={<Biryani />} />
             <Route path="/myprofile" element={<MyProfile />} />
+            <Route path="/all" element={<All/>} />
           </Routes>
           <Footer />
         </store.Provider>

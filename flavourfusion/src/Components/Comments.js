@@ -6,7 +6,7 @@ import { store } from '../App';
 import CommentDisplay from './DisplayComments';
 
 
-const CommentSection = () => {
+const CommentSection = ({recipeID}) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ const CommentSection = () => {
       const response = await axios.post('http://localhost:5000/comments', {
         content: comment,
         rating: rating,
+        recipe:recipeID
      
       }, {
         headers: {
@@ -75,7 +76,7 @@ const CommentSection = () => {
           </div>
         </div>
         <button type="submit" className="submit-comment">Post Comment</button>
-        <CommentDisplay postId={commentId} />
+        <CommentDisplay postId={commentId} recipeID={recipeID} />
       </form>
     </div>
   );

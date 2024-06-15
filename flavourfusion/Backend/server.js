@@ -1,10 +1,15 @@
 const express = require('express');
-const RegisterUser = require('./models/RegisterUser');
-const Comment = require('./models/Comment');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const middleware = require('./middleware');
 const cors = require('cors');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+const middleware = require('./middleware');
+
+const RegisterUser = require('./models/RegisterUser');
+const Comment = require('./models/Comment');
+const Recipe = require('./models/RecipeSchema');
 
 const app = express();
 app.use(express.json());
@@ -13,6 +18,22 @@ app.use(cors({ origin: "*" }));
 mongoose.connect("mongodb+srv://vallirani:NewPass@cluster0.ykmsdrg.mongodb.net/React-nodeDB?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("DB connected successfully"));
 
+const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            const uploadPath = 'uploads/';
+            if (!fs.existsSync(uploadPath)) {
+                fs.mkdirSync(uploadPath);
+            }
+            cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+            cb(null, Date.now() + path.extname(file.originalname));
+        }
+      });
+      
+const upload = multer({ storage: storage });
+
+      
 app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
@@ -95,6 +116,7 @@ app.post('/comments', middleware, async (req, res) => {
     try {
         const { postId, content, rating } = req.body; // Include rating in the request body
         const newComment = new Comment({
+            // recipe:req.recipe.id,
             user: req.user.id,
             content,
             rating // Save the rating
@@ -109,6 +131,55 @@ app.post('/comments', middleware, async (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log("Server is running ..");
-});
+// Submit a new recipe endpoint
+app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
+    try {
+        const { Author,recipeName, ingredients, instructions } = req.body;
+        const imagePath = req.file ? req.file.path : null;
+        const newRecipe = new Recipe({
+            Author,
+            recipeName,
+            ingredients,
+            instructions,
+            imagePath
+        });
+        await newRecipe.save();
+        res.status(201).json({ message: 'Recipe submitted successfully', recipe: newRecipe });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+  });
+  
+  // Get all recipes endpoint
+  app.get('/recipes', async (req, res) => {
+    try {
+        const recipes = await Recipe.find();
+        res.json(recipes);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+  });
+  
+  // Get recipe by ID endpoint
+  app.get('/recipes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const recipe = await Recipe.findById(id);
+        if (!recipe) {
+            return res.status(404).send('Recipe not found');
+        }
+        res.json(recipe);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+  });
+  
+  app.listen(5000, () => {
+    console.log("Server is running .....");
+  });
+  
+  
+  
