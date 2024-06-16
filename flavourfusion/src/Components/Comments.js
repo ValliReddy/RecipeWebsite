@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { store } from '../App';
 import CommentDisplay from './DisplayComments';
+import { RecipeContext } from '../App';
 
 
-const CommentSection = ({recipeID}) => {
+const CommentSection = () => {
+  const { recipeID } = useContext(RecipeContext);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const navigate = useNavigate();
@@ -37,10 +39,10 @@ const CommentSection = ({recipeID}) => {
           'x-token': storedToken 
         }
       });
-      console.log(response.data)
+      // console.log(response.data)
       const { commentId } = response.data; 
       setCommentId(commentId);
-      console.log(commentId)
+      // console.log(commentId)
   
       setComment('');
       setRating(0);

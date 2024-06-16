@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const middleware = require('./middleware');
 
 const RegisterUser = require('./models/RegisterUser');
@@ -18,22 +18,23 @@ app.use(cors({ origin: "*" }));
 mongoose.connect("mongodb+srv://vallirani:NewPass@cluster0.ykmsdrg.mongodb.net/React-nodeDB?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("DB connected successfully"));
 
-const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            const uploadPath = 'uploads/';
-            if (!fs.existsSync(uploadPath)) {
-                fs.mkdirSync(uploadPath);
-            }
-            cb(null, uploadPath);
-        },
-        filename: (req, file, cb) => {
-            cb(null, Date.now() + path.extname(file.originalname));
-        }
-      });
-      
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: 'dyf5rmdgy',
+  api_key: '291131827599212',
+  api_secret: 'qDvPF8PHD_lOyEdXcByxqEAX1L4'
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'recipes',
+    allowed_formats: ['jpg', 'jpeg', 'png']
+  }
+});
+
 const upload = multer({ storage: storage });
 
-      
 app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
@@ -104,7 +105,7 @@ app.get('/myprofile', middleware, async (req, res) => {
 app.get('/comments/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const comments = await Comment.find({ _id: id }).populate('user', 'username');
+        const comments = await Comment.find({ recipe: id }).populate('user', 'username');
         res.json(comments);
     } catch (err) {
         console.error(err.message);
@@ -114,9 +115,10 @@ app.get('/comments/:id', async (req, res) => {
 
 app.post('/comments', middleware, async (req, res) => {
     try {
-        const { postId, content, rating } = req.body; // Include rating in the request body
+        const { recipe, content, rating } = req.body; // Include rating in the request body
         const newComment = new Comment({
             // recipe:req.recipe.id,
+            recipe,
             user: req.user.id,
             content,
             rating // Save the rating
@@ -134,10 +136,9 @@ app.post('/comments', middleware, async (req, res) => {
 // Submit a new recipe endpoint
 app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
     try {
-        const { Author,recipeName, ingredients, instructions } = req.body;
+        const { recipeName, ingredients, instructions } = req.body;
         const imagePath = req.file ? req.file.path : null;
         const newRecipe = new Recipe({
-            Author,
             recipeName,
             ingredients,
             instructions,
@@ -149,10 +150,10 @@ app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
-  });
-  
-  // Get all recipes endpoint
-  app.get('/recipes', async (req, res) => {
+});
+
+// Get all recipes endpoint
+app.get('/recipes', async (req, res) => {
     try {
         const recipes = await Recipe.find();
         res.json(recipes);
@@ -160,10 +161,10 @@ app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
-  });
-  
-  // Get recipe by ID endpoint
-  app.get('/recipes/:id', async (req, res) => {
+});
+
+// Get recipe by ID endpoint
+app.get('/recipes/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const recipe = await Recipe.findById(id);
@@ -175,11 +176,8 @@ app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
-  });
-  
-  app.listen(5000, () => {
+});
+
+app.listen(5000, () => {
     console.log("Server is running .....");
-  });
-  
-  
-  
+});

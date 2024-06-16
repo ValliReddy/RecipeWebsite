@@ -1,44 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext} from 'react';
 import axios from 'axios';
+import { RecipeContext } from '../App';
 
-const CommentDisplay = ({ postId }) => {
+const CommentDisplay = ({}) => {
+  const { recipeID } = useContext(RecipeContext);
   const [comments, setComments] = useState([]);
-  const [commentIds, setCommentIds] = useState([]);
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/comments/${postId}`);
+        const response = await axios.get(`http://localhost:5000/comments/${recipeID}`);
         const fetchedComments = response.data;
-
-      
-        const newComments = fetchedComments.filter(comment => !commentIds.includes(comment._id));
-
-       
-        const updatedCommentIds = [...commentIds, ...newComments.map(comment => comment._id)];
-        setCommentIds(updatedCommentIds);
-        setComments(prevComments => [...prevComments, ...newComments]);
-
-       
-        localStorage.setItem('comments', JSON.stringify(comments.concat(newComments)));
+        setComments(fetchedComments);
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
     };
 
     fetchComments();
-  }, [postId]); 
-
-  useEffect(() => {
-    const storedComments = localStorage.getItem('comments');
-    if (storedComments) {
-      const parsedComments = JSON.parse(storedComments);
-      const uniqueCommentIds = [...new Set(parsedComments.map(comment => comment._id))];
-
-      setCommentIds(uniqueCommentIds);
-      setComments(parsedComments);
-    }
-  }, []); 
+  }, [recipeID]);
 
   const renderStars = (rating) => {
     const stars = [];
@@ -51,7 +31,6 @@ const CommentDisplay = ({ postId }) => {
       </div>
     );
   };
-  
 
   return (
     <div className="comment-list">

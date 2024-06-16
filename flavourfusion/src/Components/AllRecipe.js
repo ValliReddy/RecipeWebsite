@@ -1,23 +1,22 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import CommentSection from './Comments';
-import axios from 'axios'; // Import axios for making HTTP requests
+import axios from 'axios';
+import { RecipeContext } from '../App';
 
 const All = () => {
+  const { recipeID } = useContext(RecipeContext);
   const componentRef = useRef();
 
-  // State to hold recipe data
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch recipe data
   const fetchRecipe = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/recipes/666d8ef69e022173b2467d7c'); // Replace with your backend endpoint
-      setRecipe(response.data); 
-    //   console.log('Recipe ID:', recipe._id);
-      console.log(response.data);// Assuming your API returns recipe data in JSON format
+      const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
+      setRecipe(response.data);
+      console.log('Fetched recipe:', response.data);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -25,10 +24,11 @@ const All = () => {
     }
   };
 
-  // Fetch recipe data on component mount
   useEffect(() => {
-    fetchRecipe();
-  }, []);
+    if (recipeID) {
+      fetchRecipe();
+    }
+  }, [recipeID]);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -52,7 +52,8 @@ const All = () => {
         <div className="inner">
           <h1>{recipe.recipeName}</h1>
           <span className="image main">
-            <img src={`http://localhost:5000/${recipe.imagePath}`} alt="" style={{ width: '50%', maxWidth: '700px' }} />
+            {/* Ensure imagePath is correct */}
+            <img src={recipe.imagePath} alt="Recipe Image" style={{ width: '50%', maxWidth: '700px' }} onError={(e) => console.log('Image Error:', e)} />
           </span>
           <h2>Ingredients:</h2>
           <ul>
@@ -72,9 +73,8 @@ const All = () => {
         <button className="recipe" onClick={handlePrint}>
           Print Recipe
         </button>
-        {/* Button to toggle comment visibility */}
         <h2>Leave a comment</h2>
-        <CommentSection recipeID={recipe._id} />
+        <CommentSection />
       </div>
     </div>
   );
