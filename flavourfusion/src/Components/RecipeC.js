@@ -1,14 +1,14 @@
 // RecipeForm.js
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { RecipeContext } from '../App'; // Adjust the import path if necessary
+// import { RecipeContext } from '../App'; // Adjust the import path if necessary
 
 const RecipeForm = ({ open, setCloseForm }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
     const [image, setImage] = useState(null);
-    const { setRecipeID } = useContext(RecipeContext);
+    // const { setRecipeID } = useContext(RecipeContext);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -27,8 +27,8 @@ const RecipeForm = ({ open, setCloseForm }) => {
                 }
             });
             console.log(response.data);
-            setRecipeID(response.data.recipe._id); // Set the recipe ID in the context
-            console.log('Recipe ID:', response.data.recipe._id);
+            // setRecipeID(response.data.recipe._id); // Set the recipe ID in the context
+            // console.log('Recipe ID:', response.data.recipe._id);
             setCloseForm(false);
         } catch (error) {
             console.error('Error submitting recipe:', error);

@@ -2714,9 +2714,9 @@ input, select, textarea {
 						margin-bottom: 0;
 					}
 
-			.tiles article.style1 > .image:before {
+			/* .tiles article.style1 > .image:before {
 				background-color: #f2849e;
-			}
+			} */
 
 			.tiles article.style2 > .image:before {
 				background-color: #7ecaf6;

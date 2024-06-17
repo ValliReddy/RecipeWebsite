@@ -1,8 +1,8 @@
-import React, { useState, useEffect,useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { RecipeContext } from '../App';
 
-const CommentDisplay = ({}) => {
+const CommentDisplay = () => {
   const { recipeID } = useContext(RecipeContext);
   const [comments, setComments] = useState([]);
 
@@ -10,14 +10,15 @@ const CommentDisplay = ({}) => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/comments/${recipeID}`);
-        const fetchedComments = response.data;
-        setComments(fetchedComments);
+        setComments(response.data);
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
     };
 
-    fetchComments();
+    if (recipeID) {
+      fetchComments();
+    }
   }, [recipeID]);
 
   const renderStars = (rating) => {
@@ -25,18 +26,25 @@ const CommentDisplay = ({}) => {
     for (let i = 0; i < rating; i++) {
       stars.push(<span key={`star-${i}`} className="star">&#9733;</span>);
     }
-    return (
-      <div className="stars">
-        {stars}
-      </div>
-    );
+    return <div className="stars">{stars}</div>;
   };
 
   return (
     <div className="comment-list">
-      {comments.map(comment => (
-        <div key={comment._id} className="comment" style={{ backgroundColor: '#f3f3f3', padding: '10px', marginBottom: '10px' }}>
-          <p><strong>{comment.user.username}</strong></p>
+      {comments.map((comment) => (
+        <div
+          key={comment._id}
+          className="comment"
+          style={{
+            background: '#fffffb',
+            boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.5)',
+            padding: '10px',
+            marginBottom: '10px',
+          }}
+        >
+          <p>
+            <strong>{comment.user.username}</strong>
+          </p>
           <p style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{comment.content}</span>
             {renderStars(comment.rating)}

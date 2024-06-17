@@ -1,10 +1,9 @@
-// App.js
 import React, { useState, useEffect, createContext } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './Components/Header'; // Adjust the import path if necessary
 import MainContent from './Components/Main'; // Adjust the import path if necessary
 import Footer from './Components/Footer'; // Adjust the import path if necessary
 import './App.css'; // Import CSS styles for your components
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUp from './Components/signup'; // Adjust the import path if necessary
 import Login from './Components/Login';
 import Biryani from './Components/Biryani';
