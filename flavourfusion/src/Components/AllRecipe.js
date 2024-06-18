@@ -82,7 +82,7 @@ const All = () => {
       <div className="new-login-container">
         <div className="new-profile-img"></div>
         <h1 className="new-profile-name">
-          Maddie
+         {recipe.Author}
         </h1>
         <div className="new-description">
         A passionate chef who loves cooking, exploring new recipes, and sharing culinary experiences.

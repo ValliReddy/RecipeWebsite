@@ -136,9 +136,10 @@ app.post('/comments', middleware, async (req, res) => {
 // Submit a new recipe endpoint
 app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {
     try {
-        const { recipeName, ingredients, instructions } = req.body;
+        const { Author,recipeName, ingredients, instructions } = req.body;
         const imagePath = req.file ? req.file.path : null;
         const newRecipe = new Recipe({
+            Author,
             recipeName,
             ingredients,
             instructions,

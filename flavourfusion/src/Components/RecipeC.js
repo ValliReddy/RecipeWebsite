@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 // import { RecipeContext } from '../App'; // Adjust the import path if necessary
 
-const RecipeForm = ({ open, setCloseForm }) => {
+const RecipeForm = ({ open, setCloseForm,Author }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
@@ -13,6 +13,7 @@ const RecipeForm = ({ open, setCloseForm }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const formData = new FormData();
+        formData.append('Author',Author);
         formData.append('recipeName', recipeName);
         formData.append('ingredients', ingredients);
         formData.append('instructions', instructions);
@@ -52,7 +53,7 @@ const RecipeForm = ({ open, setCloseForm }) => {
                         <h5 className="card-title">Submit Your Recipe</h5>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label htmlFor="recipeName" className="form-label">Recipe Name:</label>
+                                <label htmlFor="recipeName" className="form-label">Recipe Name:Give attractive name to your recipe</label>
                                 <input
                                     type="text"
                                     id="recipeName"

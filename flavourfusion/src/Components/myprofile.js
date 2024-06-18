@@ -44,6 +44,7 @@ const MyProfile = () => {
     navigate('/login'); // Redirect to login page
   };
 
+
   const handleRecipe = () => {
     setShowForm(true);
   };
@@ -62,6 +63,7 @@ const MyProfile = () => {
               <div className="row g-0">
                 <div className="col-md-12 text-center text-white mb-3" style={{ background: 'linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))', borderRadius: '.5rem 0 0 .5rem', padding: '20px' }}>
                   <img src="./images/chef.png" alt="Avatar" className="img-fluid my-3" style={{ width: '120px', borderRadius: '50%' }} />
+                  <center>{data.username}</center>
                   <center><h3>Chef</h3></center>
                   <div className="d-flex justify-content-center">
                     <a href="#!" style={{ marginRight: '20px' }}><i className="fab fa-facebook-f fa-lg"></i></a>
@@ -112,7 +114,7 @@ const MyProfile = () => {
             <div style={{ width: '50%', padding: '40px' }}>
               <div className="card mb-3" style={{ borderRadius: '.5rem', background: '#fffffb', boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.5)' }}>
                 <div className="card-body p-4">
-                  <RecipeForm open={true} setCloseForm={handleCloseForm} />
+                  <RecipeForm open={true} Author={data.username} setCloseForm={handleCloseForm} />
                 </div>
               </div>
             </div>

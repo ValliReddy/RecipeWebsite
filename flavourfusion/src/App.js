@@ -9,6 +9,7 @@ import Login from './Components/Login';
 import Biryani from './Components/Biryani';
 import MyProfile from './Components/myprofile';
 import All from './Components/AllRecipe';
+import EditProfile from './Components/EditProfile';
 
 export const store = createContext();
 export const RecipeContext = createContext();
@@ -37,6 +38,7 @@ const App = () => {
               <Route path="/biryani" element={<Biryani />} />
               <Route path="/myprofile" element={<MyProfile />} />
               <Route path="/all" element={<All />} />
+              <Route path="/editprofile" element={<EditProfile/>} />
             </Routes>
             <Footer />
           </RecipeContext.Provider>
