@@ -9,6 +9,7 @@ const MyProfile = () => {
   const [token, setToken] = useContext(store);
   const [data, setData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [userID, setUserID] = useState(null); // State to hold userID
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +45,6 @@ const MyProfile = () => {
     navigate('/login'); // Redirect to login page
   };
 
-
   const handleRecipe = () => {
     setShowForm(true);
   };
@@ -52,6 +52,16 @@ const MyProfile = () => {
   const handleCloseForm = () => {
     setShowForm(false); // Set showForm state to false to close the form
   };
+
+  const handleEditProfile = () => {
+    navigate('/editprofile', { state: { userID: userID } }); // Navigate to edit-profile page with userID as state
+  };
+
+  useEffect(() => {
+    if (data) {
+      setUserID(data._id);
+    }
+  }, [data]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'left', alignItems: 'left' }}>
@@ -64,7 +74,6 @@ const MyProfile = () => {
                 <div className="col-md-12 text-center text-white mb-3" style={{ background: 'linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))', borderRadius: '.5rem 0 0 .5rem', padding: '20px' }}>
                   <img src="./images/chef.png" alt="Avatar" className="img-fluid my-3" style={{ width: '120px', borderRadius: '50%' }} />
                   <center>{data.username}</center>
-                  <center><h3>Chef</h3></center>
                   <div className="d-flex justify-content-center">
                     <a href="#!" style={{ marginRight: '20px' }}><i className="fab fa-facebook-f fa-lg"></i></a>
                     <a href="#!" style={{ marginRight: '20px' }}><i className="fab fa-twitter fa-lg"></i></a>
@@ -72,6 +81,7 @@ const MyProfile = () => {
                   </div>
                   <div className="text-center mt-4">
                     <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                    <button className="btn btn-danger" onClick={handleEditProfile}>Edit</button> {/* Edit Profile button */}
                   </div>
                 </div>
                 <div className="col-md-12">

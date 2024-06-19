@@ -14,7 +14,7 @@ const Header = ({ token }) => {
           <ul>
             {!token && <li><Link to="/signup">Sign up</Link></li>}
             {!token && <li><Link to="/login">Login</Link></li>}
-            {token && <li><Link to="/editprofile">Edit Profile</Link></li>}
+            {/* {token && <li><Link to="/editprofile">Edit Profile</Link></li>} */}
             {token && <li><Link to="/myprofile">My Profile</Link></li>}
           </ul>
         </nav>

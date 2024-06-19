@@ -10,6 +10,7 @@ const middleware = require('./middleware');
 const RegisterUser = require('./models/RegisterUser');
 const Comment = require('./models/Comment');
 const Recipe = require('./models/RecipeSchema');
+const EditProfile = require('./models/EditSchema');
 
 const app = express();
 app.use(express.json());
@@ -176,6 +177,57 @@ app.get('/recipes/:id', async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
+    }
+});
+
+app.get('/edit-profile/:userId', async (req, res) => {
+    try {
+        const editProfile = await EditProfile.findOne({ userId: req.params.userId });
+        if (!editProfile) {
+            return res.status(404).json({ msg: 'Edit profile not found' });
+        }
+        res.json(editProfile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+app.post('/edit-profile/:userId', upload.single('profileImage'), async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { username, about, facebook, twitter, instagram } = req.body;
+
+        let editProfile = await EditProfile.findOne({ userId });
+
+        if (editProfile) {
+            // Update existing edit profile
+            editProfile.username = username;
+            editProfile.about = about;
+            editProfile.socialMedia = { facebook, twitter, instagram };
+
+            // Handle profile image upload if present
+            if (req.file && req.file.path) {
+                editProfile.profileImage = req.file.path;
+            }
+
+            await editProfile.save();
+        } else {
+            // Create new edit profile
+            const profileImage = req.file ? req.file.path : undefined;
+            editProfile = new EditProfile({
+                userId,
+                username,
+                about,
+                profileImage,
+                socialMedia: { facebook, twitter, instagram }
+            });
+            await editProfile.save();
+        }
+
+        res.json(editProfile); // Ensure response is sent correctly
+    } catch (err) {
+        console.error("Error updating profile:", err); // Log the error for debugging
+        res.status(500).send('Server Error'); // Ensure a clear response is sent for errors
     }
 });
 
