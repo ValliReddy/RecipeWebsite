@@ -222,6 +222,9 @@ app.post('/edit-profile/:userId', upload.single('profileImage'), async (req, res
                 username,
                 about,
                 profileImage,
+                followers,
+                ratings,
+                recipeCount,
                 socialMedia: { facebook, twitter, instagram }
             });
             await editProfile.save();
@@ -233,6 +236,31 @@ app.post('/edit-profile/:userId', upload.single('profileImage'), async (req, res
         res.status(500).send('Server Error'); // Ensure a clear response is sent for errors
     }
 });
+
+app.post('/follow/:userId', async (req, res) => {
+    const userId = req.params.userId;
+  
+    try {
+      // Find the EditProfile document for the given userId
+      let profile = await EditProfile.findOne({ userId });
+  
+      if (!profile) {
+        return res.status(404).json({ message: 'Profile not found' });
+      }
+  
+      // Increment the followers count
+      profile.followers += 1;
+  
+      // Save the updated profile
+      await profile.save();
+  
+      // Respond with the updated profile data
+      res.json(profile);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
 app.listen(5000, () => {
     console.log("Server is running .....");

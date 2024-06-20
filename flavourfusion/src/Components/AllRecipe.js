@@ -13,19 +13,22 @@ const All = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [authorID, setAuthorID] = useState(null);
-  // Profile state variables
   const [profileData, setProfileData] = useState({
     username: '',
     followers: '',
     ratings: '',
-    about: ''
+    about: '',
+    profileImage: ''
   });
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followButtonDisabled, setFollowButtonDisabled] = useState(false);
 
   const fetchRecipe = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
-      setAuthorID(response.data.Author); // Safely access Author's _id
+      setAuthorID(response.data.Author);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -38,10 +41,26 @@ const All = () => {
       if (authorID) {
         const response = await axios.get(`http://localhost:5000/edit-profile/${authorID}`);
         setProfileData(response.data);
-        console.log(profileData)
+        setFollowersCount(response.data.followers);
+        setIsFollowing(response.data.isFollowing); // Assuming backend returns if current user is following
       }
     } catch (error) {
       console.log(error.message);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      if (!isFollowing) {
+        const response = await axios.post(`http://localhost:5000/follow/${authorID}`);
+        if (response.status === 200) {
+          setIsFollowing(true); // Update local state
+          setFollowersCount(response.data.followers);
+          setFollowButtonDisabled(true); // Disable the button after following
+        }
+      }
+    } catch (error) {
+      console.error('Error following profile:', error);
     }
   };
 
@@ -55,7 +74,7 @@ const All = () => {
     if (authorID) {
       fetchProfile();
     }
-  }, [authorID]);
+  }, [authorID, isFollowing]); // Update when following status changes
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -80,7 +99,7 @@ const All = () => {
           <div className="inner">
             <h1>{recipe.recipeName}</h1>
             <span className="image main">
-              <center><img src={recipe.imagePath} alt="Recipe Image" style={{width: '50%', maxWidth: '700px' }} onError={(e) => console.log('Image Error:', e)} /></center>
+              <center><img src={recipe.imagePath} alt="Recipe Image" style={{ width: '50%', maxWidth: '700px' }} onError={(e) => console.log('Image Error:', e)} /></center>
             </span>
             <h2>Ingredients:</h2>
             <ul>
@@ -105,18 +124,18 @@ const All = () => {
         </div>
       </div>
       <div className="new-login-container">
-      <div className="new-profile-img" style={{ backgroundImage: `url(${profileData.profileImage})`}}></div>
+        <div className="new-profile-img" style={{ backgroundImage: `url(${profileData.profileImage})` }}></div>
         <h1 className="new-profile-name">
           {profileData.username}
         </h1>
         <div className="new-description">
           {profileData.about}
         </div>
-        <button className="new-follow-button">
-          <i className='fa fa-heart'></i> Follow
+        <button className="new-follow-button" onClick={handleFollow} disabled={followButtonDisabled}>
+          <i className='fa fa-heart'></i> {isFollowing ? 'Following' : 'Follow'}
         </button>
         <div className="new-followers">
-          <span className="label">Followers:</span> <span className="value">{profileData.followers}</span>
+          <span className="label">Followers:</span> <span className="value">{followersCount}</span>
         </div>
         <div className="new-ratings">
           <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>
