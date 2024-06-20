@@ -3,17 +3,19 @@ import React, { useState } from 'react';
 import axios from 'axios';
 // import { RecipeContext } from '../App'; // Adjust the import path if necessary
 
-const RecipeForm = ({ open, setCloseForm,Author }) => {
+
+const RecipeForm = ({ open, userID, setCloseForm}) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
     const [image, setImage] = useState(null);
+    
     // const { setRecipeID } = useContext(RecipeContext);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const formData = new FormData();
-        formData.append('Author',Author);
+        formData.append('Author', userID); ;
         formData.append('recipeName', recipeName);
         formData.append('ingredients', ingredients);
         formData.append('instructions', instructions);

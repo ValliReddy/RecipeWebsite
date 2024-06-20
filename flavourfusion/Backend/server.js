@@ -7,6 +7,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const middleware = require('./middleware');
 
+
 const RegisterUser = require('./models/RegisterUser');
 const Comment = require('./models/Comment');
 const Recipe = require('./models/RecipeSchema');
@@ -15,6 +16,8 @@ const EditProfile = require('./models/EditSchema');
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*" }));
+
+
 
 mongoose.connect("mongodb+srv://vallirani:NewPass@cluster0.ykmsdrg.mongodb.net/React-nodeDB?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("DB connected successfully"));

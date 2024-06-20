@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const RecipeSchema = new mongoose.Schema({
     Author:{
         type:String,
-        required:false
+        required:true
     },
     recipeName: {
         type: String,

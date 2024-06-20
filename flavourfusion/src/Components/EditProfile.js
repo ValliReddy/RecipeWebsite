@@ -1,32 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import axios from 'axios';
 import './Edit.css';
 import { useLocation } from 'react-router-dom';
 
+
+
 const EditProfile = () => {
     const location = useLocation();
-    const [profileImage, setProfileImage] = useState(null);
-    const [username, setUsername] = useState('');
-    const [about, setAbout] = useState('');
-    const [facebook, setFacebook] = useState('');
-    const [twitter, setTwitter] = useState('');
-    const [instagram, setInstagram] = useState('');
-    const { userID } = location.state;
+    const { userID,ProfileData } = location.state;
+    ;
 
+    
+    
+
+    // State variables
+    const [profileImage, setProfileImage] = useState(ProfileData.profileImage || "/images/profile.png");
+    const [profileImageFile, setProfileImageFile] = useState(null);
+    const [username, setUsername] = useState(ProfileData.username || '');
+    const [about, setAbout] = useState(ProfileData.about || '');
+    const [facebook, setFacebook] = useState(ProfileData.socialMedia?.facebook || '');
+    const [twitter, setTwitter] = useState(ProfileData.socialMedia?.twitter || '');
+    const [instagram, setInstagram] = useState(ProfileData.socialMedia?.instagram || '');
+
+    // Handle profile image upload
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setProfileImage(file);
+            setProfileImage(URL.createObjectURL(file));
+            setProfileImageFile(file);
         }
     };
 
+    // Handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const formData = new FormData();
         formData.append('userID', userID);
-        if (profileImage) {
-            formData.append('profileImage', profileImage);
+        if (profileImageFile) {
+            formData.append('profileImage', profileImageFile);
         }
         formData.append('username', username);
         formData.append('about', about);

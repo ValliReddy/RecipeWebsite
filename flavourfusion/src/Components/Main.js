@@ -4,6 +4,7 @@ import axios from 'axios';
 import { RecipeContext } from '../App';
 import { FaSearch } from 'react-icons/fa'; // Import search icon
 
+
 const MainContent = () => {
   const [recipes, setRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,7 +61,7 @@ const MainContent = () => {
                 <h2>{recipe.recipeName}</h2>
                 <div className="content">
                   <p>
-                    Recipe by <strong style={{ textTransform: 'capitalize' }}>{recipe.Author}</strong>
+                    Recipe by <strong style={{ textTransform: 'capitalize' }}></strong>
                   </p>
                 </div>
               </Link>

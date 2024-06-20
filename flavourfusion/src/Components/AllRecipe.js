@@ -1,5 +1,3 @@
-// All.js
-
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import CommentSection from './Comments';
@@ -8,21 +6,42 @@ import { RecipeContext } from '../App';
 
 const All = () => {
   const { recipeID } = useContext(RecipeContext);
+
   const componentRef = useRef();
 
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [authorID, setAuthorID] = useState(null);
+  // Profile state variables
+  const [profileData, setProfileData] = useState({
+    username: '',
+    followers: '',
+    ratings: '',
+    about: ''
+  });
 
   const fetchRecipe = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
-      console.log('Fetched recipe:', response.data);
+      setAuthorID(response.data.Author); // Safely access Author's _id
       setLoading(false);
     } catch (error) {
       setError(error.message);
       setLoading(false);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      if (authorID) {
+        const response = await axios.get(`http://localhost:5000/edit-profile/${authorID}`);
+        setProfileData(response.data);
+        console.log(profileData)
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   };
 
@@ -31,6 +50,12 @@ const All = () => {
       fetchRecipe();
     }
   }, [recipeID]);
+
+  useEffect(() => {
+    if (authorID) {
+      fetchProfile();
+    }
+  }, [authorID]);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -80,21 +105,21 @@ const All = () => {
         </div>
       </div>
       <div className="new-login-container">
-        <div className="new-profile-img"></div>
+      <div className="new-profile-img" style={{ backgroundImage: `url(${profileData.profileImage})`}}></div>
         <h1 className="new-profile-name">
-         {recipe.Author}
+          {profileData.username}
         </h1>
         <div className="new-description">
-        A passionate chef who loves cooking, exploring new recipes, and sharing culinary experiences.
+          {profileData.about}
         </div>
         <button className="new-follow-button">
           <i className='fa fa-heart'></i> Follow
         </button>
         <div className="new-followers">
-          <span className="label">Followers:</span> <span className="value">1.5K</span>
+          <span className="label">Followers:</span> <span className="value">{profileData.followers}</span>
         </div>
         <div className="new-ratings">
-          <span className="label">Ratings:</span> <span className="value">4.8/5</span>
+          <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>
         </div>
       </div>
     </div>

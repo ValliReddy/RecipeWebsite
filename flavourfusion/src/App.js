@@ -14,9 +14,11 @@ import EditProfile from './Components/EditProfile';
 export const store = createContext();
 export const RecipeContext = createContext();
 
+
 const App = () => {
   const [token, setToken] = useState(null);
   const [recipeID, setRecipeID] = useState('');
+  
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -30,6 +32,7 @@ const App = () => {
       <div id="wrapper">
         <store.Provider value={[token, setToken]}>
           <RecipeContext.Provider value={{ recipeID, setRecipeID }}>
+           
             <Header token={token} />
             <Routes>
               <Route path="/" element={<MainContent />} />
@@ -41,6 +44,7 @@ const App = () => {
               <Route path="/editprofile" element={<EditProfile/>} />
             </Routes>
             <Footer />
+           
           </RecipeContext.Provider>
         </store.Provider>
       </div>
