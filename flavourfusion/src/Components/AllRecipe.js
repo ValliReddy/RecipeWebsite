@@ -28,7 +28,7 @@ const All = () => {
     try {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
-      setAuthorID(response.data.Author);
+      setAuthorID(response.data.Author); //who writes recipe store authorid
       setLoading(false);
     } catch (error) {
       setError(error.message);
