@@ -13,6 +13,17 @@
   font-family: 'Sriracha', cursive, arial, sans-serif;
   
 }
+.social-icons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.social-icons a {
+  font-size: 24px;
+  text-decoration: none;
+}
+
 
 .container {
   display: flex;
@@ -22,13 +33,13 @@
 
 .menu-card {
   flex: 1;
-  margin-right: 10px; /* Reduced margin to decrease gap */
+  margin-right: 30px; /* Reduced margin to decrease gap */
 }
 
 .new-login-container {
   width: 300px;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 30px;
+  border-radius: 10px;
   background: #fffffb;
   position: relative;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);

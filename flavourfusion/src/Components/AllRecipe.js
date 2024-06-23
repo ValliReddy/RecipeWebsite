@@ -20,7 +20,12 @@ const All = () => {
     followers: '',
     ratings: '',
     about: '',
-    profileImage: ''
+    profileImage: '',
+    socialMedia: {
+      instagram: '',
+      twitter: '',
+      facebook: ''
+    }
   });
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
@@ -118,7 +123,7 @@ const All = () => {
   }
 
   return (
-    <div className="container">
+    <div className="container" style={{justifyContent:'center',alignContent:'center'}}>
       <div className="menu-card">
         <div className="card" ref={componentRef}>
           <div className="inner">
@@ -149,23 +154,35 @@ const All = () => {
         </div>
       </div>
       <div className="new-login-container">
-        <div className="new-profile-img" style={{ backgroundImage: `url(${profileData.profileImage})` }}></div>
-        <h1 className="new-profile-name">
-          {profileData.username}
-        </h1>
-        <div className="new-description">
-          {profileData.about}
-        </div>
-        <button onClick={handleFollow} disabled={followButtonDisabled}>
+      <div className="new-profile-img" style={{ backgroundImage: `url(${profileData.profileImage})` }}></div>
+      <h1 className="new-profile-name">
+        {profileData.username}
+      </h1>
+      <div className="new-description">
+        {profileData.about}
+      </div>
+      <button onClick={handleFollow} disabled={followButtonDisabled}>
         {isFollowing ? 'Following' : 'Follow'}
       </button>
-        <div className="new-followers">
-          <span className="label">Followers:</span> <span className="value">{profileData.followersCount}</span>
-        </div>
-        <div className="new-ratings">
-          <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>
-        </div>
+      <div className="new-followers">
+        <span className="label">Followers:</span> <span className="value">{profileData.followersCount}</span>
       </div>
+      <div className="new-ratings">
+        <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>
+      </div>
+      <div className="social-icons">
+        <a href={`https://www.instagram.com/${profileData.socialMedia.instagram}`} target="_blank" rel="noopener noreferrer">
+          <i className="fab fa-instagram" style={{ color: '#E4405F' }}></i>
+        </a>
+        <a href={`https://www.twitter.com/${profileData.socialMedia.twitter}`} target="_blank" rel="noopener noreferrer">
+          <i className="fab fa-twitter" style={{ color: '#1DA1F2' }}></i>
+        </a>
+        <a href={`https://www.facebook.com/${profileData.socialMedia.facebook}`} target="_blank" rel="noopener noreferrer">
+          <i className="fab fa-facebook" style={{ color: '#1877F2' }}></i>
+        </a>
+      </div>
+    </div>
+
     </div>
   );
 };
