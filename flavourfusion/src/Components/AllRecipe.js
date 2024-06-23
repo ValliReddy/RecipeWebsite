@@ -3,12 +3,14 @@ import { useReactToPrint } from 'react-to-print';
 import CommentSection from './Comments';
 import axios from 'axios';
 import { RecipeContext } from '../App';
+import { useNavigate } from 'react-router-dom';
+import { store } from '../App';
 
 const All = () => {
   const { recipeID } = useContext(RecipeContext);
-
+  const navigate = useNavigate();
   const componentRef = useRef();
-
+  const [token] = useContext(store); 
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +31,7 @@ const All = () => {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
       setAuthorID(response.data.Author); //who writes recipe store authorid
+      console.log(response.data.Author)
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -48,19 +51,41 @@ const All = () => {
       console.log(error.message);
     }
   };
-
   const handleFollow = async () => {
     try {
-      if (!isFollowing) {
-        const response = await axios.post(`http://localhost:5000/follow/${authorID}`);
-        if (response.status === 200) {
-          setIsFollowing(true); // Update local state
-          setFollowersCount(response.data.followers);
-          setFollowButtonDisabled(true); // Disable the button after following
+      const storedToken = token || localStorage.getItem('token');
+
+      if (!storedToken) {
+        navigate('/login');
+        return;
+      }
+
+      const config = {
+        headers: {
+          'x-token': storedToken
         }
+      };
+
+      const response = await axios.post(
+        `http://localhost:5000/follow/${authorID}`,
+        null,
+        config
+      );
+
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setFollowersCount(response.data.followersCount);
+        setFollowButtonDisabled(true);
+      } else if (response.status === 400 && response.data.message === 'You have already followed this user') {
+        console.log('User is already following this profile'); // Optionally handle this case
+      } else {
+        console.error('Unexpected response:', response);
       }
     } catch (error) {
       console.error('Error following profile:', error);
+      if (error.response) {
+        console.error('Server responded with:', error.response.data);
+      }
     }
   };
 
@@ -131,11 +156,11 @@ const All = () => {
         <div className="new-description">
           {profileData.about}
         </div>
-        <button className="new-follow-button" onClick={handleFollow} disabled={followButtonDisabled}>
-          <i className='fa fa-heart'></i> {isFollowing ? 'Following' : 'Follow'}
-        </button>
+        <button onClick={handleFollow} disabled={followButtonDisabled}>
+        {isFollowing ? 'Following' : 'Follow'}
+      </button>
         <div className="new-followers">
-          <span className="label">Followers:</span> <span className="value">{followersCount}</span>
+          <span className="label">Followers:</span> <span className="value">{profileData.followersCount}</span>
         </div>
         <div className="new-ratings">
           <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>

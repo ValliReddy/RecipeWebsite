@@ -61,6 +61,8 @@ app.post('/register', async (req, res) => {
         });
         await newUser.save();
         res.status(200).send('Registered Successfully');
+        // res.status(200).json(newUser._id);
+        
     } catch (err) {
         console.log(err);
         return res.status(500).send('Internal server error');
@@ -183,6 +185,17 @@ app.get('/recipes/:id', async (req, res) => {
     }
 });
 
+app.get('/recipes/user/:userID', async (req, res) => {
+    try {
+      const { userID } = req.params;
+      const recipes = await Recipe.find({ Author: userID }); // Assuming author field in Recipe model stores user ID
+      res.json(recipes);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
+
 app.get('/edit-profile/:userId', async (req, res) => {
     try {
         const editProfile = await EditProfile.findOne({ userId: req.params.userId });
@@ -222,9 +235,6 @@ app.post('/edit-profile/:userId', upload.single('profileImage'), async (req, res
                 username,
                 about,
                 profileImage,
-                followers,
-                ratings,
-                recipeCount,
                 socialMedia: { facebook, twitter, instagram }
             });
             await editProfile.save();
@@ -237,30 +247,57 @@ app.post('/edit-profile/:userId', upload.single('profileImage'), async (req, res
     }
 });
 
-app.post('/follow/:userId', async (req, res) => {
-    const userId = req.params.userId;
+app.post('/follow/:userId', middleware, async (req, res) => {
+    // console.log("Middleware user:", req.user); // Log middleware user
+    // console.log("Params:", req.params); // Log params to check userId
+  
+    const currentUserId = req.user.id; // Assuming req.user.id is set by your middleware
+    const targetUserId = req.params.userId;
+  
+    // console.log(`Current User ID: ${currentUserId}`);
+    // console.log(`Target User ID: ${targetUserId}`);
   
     try {
-      // Find the EditProfile document for the given userId
-      let profile = await EditProfile.findOne({ userId });
+      // Ensure a user cannot follow themselves
+      if (currentUserId === targetUserId) {
+        return res.status(400).json({ message: 'You cannot follow yourself' });
+      }
   
-      if (!profile) {
+      // Find the profile of the user to be followed
+      let targetProfile = await EditProfile.findOne({ userId: targetUserId });
+  
+      if (!targetProfile) {
         return res.status(404).json({ message: 'Profile not found' });
       }
   
-      // Increment the followers count
-      profile.followers += 1;
+      // Initialize followers array if it's null or undefined
+      if (!targetProfile.followers) {
+        targetProfile.followers = [];
+      }
+  
+      // Check if the current user has already followed the target user
+      if (targetProfile.followers.includes(currentUserId)) {
+        return res.status(400).json({ message: 'You have already followed this user' });
+      }
+  
+      // Add the current user to the followers list
+      targetProfile.followers.push(currentUserId);
+      targetProfile.followersCount += 1; // Increment followers count
   
       // Save the updated profile
-      await profile.save();
+      await targetProfile.save();
   
-      // Respond with the updated profile data
-      res.json(profile);
+      // Respond with the updated profile data and success message
+      res.json({ 
+        message: 'You have successfully followed this user',
+        profile: targetProfile 
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error' });
     }
-  });
+});
+
 
 app.listen(5000, () => {
     console.log("Server is running .....");

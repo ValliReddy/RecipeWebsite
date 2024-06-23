@@ -8,8 +8,7 @@ import { useLocation } from 'react-router-dom';
 const EditProfile = () => {
     const location = useLocation();
     const { userID,ProfileData } = location.state;
-    ;
-
+    
     
     
 

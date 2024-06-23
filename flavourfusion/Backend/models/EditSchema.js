@@ -27,7 +27,7 @@ const EditProfileSchema = new mongoose.Schema({
     },
     profileImage: {
         type: String,
-       required:true
+       required:false
     },
     about: {
         type: String,
@@ -37,7 +37,8 @@ const EditProfileSchema = new mongoose.Schema({
         type: SocialMediaSchema,
         default: () => ({})
     },
-    followers: {
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'RegisterUser' }],
+    followersCount: {
         type: Number,
         default: 0
     },
