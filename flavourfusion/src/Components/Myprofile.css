@@ -1,5 +1,5 @@
 #banner {
-    padding: 6em 0 4em 0 ;
+    padding: 2em 0 2em 0 ;
     display: -moz-flex;
     display: -webkit-flex;
     display: -ms-flex;
@@ -340,16 +340,24 @@
                                     align-items: center;
                                   }
                                   
-                                  .form-container {
-                                    background-color: #ffffff;
-                                    padding: 60px;
-                                    border-radius: 8px;
-                                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-                                    position: absolute;
-                                    max-width: 90%;
-                                    max-height: 90%;
-                                    overflow-y: auto;
-                                  }
+                                  /* styles.css or your main CSS file */
+                                .form-container {
+                                  background-color: #ffffff;
+                                  padding: 20px 20px; /* Decrease left and right padding */
+                                  border-radius: 2px;
+                                  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                                  position: absolute;
+                                  max-width: 70%; /* Increase the max-width to 90% */
+                                  width: 40%; /* Ensure width is also increased */
+                                  height: 90%;
+                                  max-height: 90%;
+                                  overflow-y: auto;
+                                  margin: auto; /* Center the container */
+                                  /* top: 50%; Adjust top for better centering */
+                                  /* left: 50%; Adjust left for better centering */
+                                  /* transform: translate(-50%, -50%); Center align using transform */
+                                }
+
                                   
                                   .close-btn {
                                     position: absolute;

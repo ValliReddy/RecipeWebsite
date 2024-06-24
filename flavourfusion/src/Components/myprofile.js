@@ -6,10 +6,7 @@ import RecipeForm from './RecipeC';
 import { store } from '../App';
 import '@fortawesome/react-fontawesome';
 
-
-
-
-const  MyProfile = () => {
+const MyProfile = () => {
   const navigate = useNavigate();
   const [token, setToken] = useContext(store);
   const [data, setData] = useState(null);
@@ -19,12 +16,13 @@ const  MyProfile = () => {
   const [userRecipes, setUserRecipes] = useState([]);
   const [showRecipes, setShowRecipes] = useState(false);
   const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
+  const [recipeToEdit, setRecipeToEdit] = useState(null); // State to hold recipe data for editing
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let storedToken = token || localStorage.getItem('token');
-        
+
         if (storedToken) {
           const response = await axios.get("http://localhost:5000/myprofile", {
             headers: {
@@ -84,6 +82,7 @@ const  MyProfile = () => {
 
   const handleCloseForm = () => {
     setShowForm(false);
+    setRecipeToEdit(null); // Reset recipeToEdit state when closing form
   };
 
   const handleEditProfile = () => {
@@ -94,24 +93,37 @@ const  MyProfile = () => {
     setShowRecipes(!showRecipes);
   };
 
-  const handleEditRecipe = (recipeID) => {
-    // Add functionality to edit recipe
-    console.log(`Edit recipe with ID: ${recipeID}`);
+  const handleEditRecipe = async (recipeID) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
+      const recipeToEdit = response.data;
+      setRecipeToEdit(recipeToEdit); // Set recipeToEdit state when editing recipe
+      setShowForm(true); // Show the form when editing
+    } catch (error) {
+      console.error('Error fetching recipe for edit:', error);
+    }
   };
 
-  const handleDeleteRecipe = (recipeID) => {
-    // Add functionality to delete recipe
-    console.log(`Delete recipe with ID: ${recipeID}`);
+  const handleDeleteRecipe = async (recipeID) => {
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      try {
+        await axios.delete(`http://localhost:5000/recipes/${recipeID}`);
+        setUserRecipes(userRecipes.filter(recipe => recipe._id !== recipeID));
+        console.log(`Recipe with ID ${recipeID} deleted successfully.`);
+      } catch (error) {
+        console.error('Error deleting recipe:', error);
+      }
+    }
   };
 
   return (
     <div className="container">
-      <div class="inner">
+      <div className="inner">
         <section id="banner">
           <div className="content">
             <header>
-              <h1>Welcome to Flavour Fusion, {ProfileData.username}!</h1>
-              <p>Setup profile here:
+              <h1  className="custom-h1">Welcome to Flavour Fusion, {ProfileData.username}!</h1>
+              <p className="custom-p">Setup profile here:
                 <a 
                   onClick={handleEditProfile} 
                   className="btn-sm btn-block" 
@@ -121,7 +133,7 @@ const  MyProfile = () => {
                 </a>
               </p>
             </header>
-            <p>Welcome to your FavourFusion, where culinary creativity meets community! This is your space to explore, create, and share your favorite fusion recipes. Whether you're combining flavors from around the world or adding your own unique twist to traditional dishes, the possibilities are endless. Dive in and start by creating your own recipes to inspire others. Engage with fellow chefs by commenting on their creations, offering tips, and rating recipes you've tried. Don't forget to explore and follow recipes that pique your interest—you never know what delicious inspiration awaits! Together, let's celebrate the joy of cooking and sharing wonderful flavors.</p>
+            <p className="custom-p">Welcome to your FavourFusion, where culinary creativity meets community! This is your space to explore, create, and share your favorite fusion recipes. Whether you're combining flavors from around the world or adding your own unique twist to traditional dishes, the possibilities are endless. Dive in and start by creating your own recipes to inspire others. Engage with fellow chefs by commenting on their creations, offering tips, and rating recipes you've tried. Don't forget to explore and follow recipes that pique your interest—you never know what delicious inspiration awaits! Together, let's celebrate the joy of cooking and sharing wonderful flavors.</p>
             <div className="text-center mt-4">
               <button className="button big" onClick={handleRecipe}>Add your own recipe</button>
             </div>
@@ -161,125 +173,62 @@ const  MyProfile = () => {
               </div>
             </article>
             <article>
-            <span className="icon solid fa-signal"></span> 
-                <div className="content">
+              <span className="icon solid fa-signal"></span> 
+              <div className="content">
                 <h3>No of recipes</h3>
-                <p><strong>{ProfileData.recipeCount}</strong></p>
+                <p><strong>{userRecipes.length}</strong></p>
               </div>
             </article>
             {data && (
-            <article>
-            <span className="icon fas fa-envelope"></span>
-              <div className="content">
-                <h3>Email</h3>
-                <p>{data.email}</p>
-              </div>
-            </article>
+              <article>
+                <span className="icon fas fa-envelope"></span>
+                <div className="content">
+                  <h3>Email</h3>
+                  <p>{data.email}</p>
+                </div>
+              </article>
             )}
           </div>
         </section>
+
         <section>
-  <header className="major">
-    <h2>Your Recipes</h2>
-  </header>
-  {userRecipes.length > 0 ? (
-    <div className="posts">
-      {userRecipes.map(recipe => (
-        <article key={recipe._id}>
-          <a href="#" className="image">
-            <img 
-              src={recipe.imagePath} 
-              alt="" 
-              style={{ width: '100%', height: '300px', objectFit: 'cover' }}
-            />
-          </a>
-          <h3>{recipe.recipeName}</h3>
-          {/* <p>{recipe.description}</p> */}
-          <ul className="actions">
-            <li><a href="#" className="button" onClick={() => handleEditRecipe(recipe._id)}>Edit</a></li>
-            <li><a href="#" className="button" onClick={() => handleDeleteRecipe(recipe._id)}>Delete</a></li>
-          </ul>
-        </article>
-      ))}
-    </div>
-  ) : (
-    <p>No recipes found.</p>
-  )}
-</section>
+          <header className="major">
+            <h2>Your Recipes</h2>
+          </header>
+          {userRecipes.length > 0 ? (
+            <div className="posts">
+              {userRecipes.map(recipe => (
+                <article key={recipe._id}>
+                  <a href="#" className="image">
+                    <img 
+                      src={recipe.imagePath} 
+                      alt="" 
+                      style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                    />
+                  </a>
+                  <h3>{recipe.recipeName}</h3>
+                  <ul className="actions">
+                    <li><a href="#" className="button" onClick={() => handleEditRecipe(recipe._id)}>Edit</a></li>
+                    <li><a href="#" className="button" onClick={() => handleDeleteRecipe(recipe._id)}>Delete</a></li>
+                  </ul>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>No recipes found.</p>
+          )}
+        </section>
 
-
-        {/* <section>
-        <header className="major">
-          <h2>Your Recipes</h2>
-        </header>
-        {userRecipes.length > 0 ? (
-        userRecipes.map(recipe => (
-        <div className="posts">
-          <article>
-            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
-            <h3>Interdum aenean</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-            <li><a href="#" className="button" onClick={() => handleEditRecipe()}>Edit</a></li>
-            <li><a href="#" className="button" onClick={() => handleDeleteRecipe()}>Delete</a></li>
-            </ul>
-          </article>
-        ))
-                  ) : (
-                    <p>No recipes found.</p>
-                  )}
-                  </div>
-          <article>
-            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
-            <h3>Nulla amet dolore</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-              <li><a href="#" className="button">More</a></li>
-            </ul>
-          </article>
-          <article>
-            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
-            <h3>Tempus ullamcorper</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-              <li><a href="#" className="button">More</a></li>
-            </ul>
-          </article>
-          <article>
-            <a href="#" className="image"><img src="images/pic04.jpg" alt="" /></a>
-            <h3>Sed etiam facilis</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-              <li><a href="#" className="button">More</a></li>
-            </ul>
-          </article>
-          <article>
-            <a href="#" className="image"><img src="images/pic05.jpg" alt="" /></a>
-            <h3>Feugiat lorem aenean</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-              <li><a href="#" className="button">More</a></li>
-            </ul>
-          </article>
-          <article>
-            <a href="#" className="image"><img src="images/pic06.jpg" alt="" /></a>
-            <h3>Amet varius aliquam</h3>
-            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-            <ul className="actions">
-              <li><a href="#" className="button">More</a></li>
-            </ul>
-          </article>
-        </div>
-      </section> */}
       </div>
+      
       {showForm && userID && (
-        <div className="overlay" >
+        <div className="overlay">
           <div className="form-container" style={modalPosition}>
-            {/* <button className="close-btn" onClick={handleCloseForm}>Close</button> */}
-            <RecipeForm open={true} userID={userID} setCloseForm={handleCloseForm} />
+            <RecipeForm open={true} userID={userID} setCloseForm={handleCloseForm} recipeToEdit={recipeToEdit} />
           </div>
         </div>
       )}
+      
     </div>
   );
 }

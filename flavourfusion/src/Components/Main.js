@@ -60,9 +60,9 @@ const MainContent = () => {
               <Link to="/all" onClick={() => handleRecipeClick(recipe._id)}>
                 <h2>{recipe.recipeName}</h2>
                 <div className="content">
-                  <p>
+                  {/* <p>
                     Recipe by <strong style={{ textTransform: 'capitalize' }}></strong>
-                  </p>
+                  </p> */}
                 </div>
               </Link>
             </article>

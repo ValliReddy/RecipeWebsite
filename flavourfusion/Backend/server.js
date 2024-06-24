@@ -298,7 +298,43 @@ app.post('/follow/:userId', middleware, async (req, res) => {
     }
 });
 
-
+app.put('/recipes/:recipeID', upload.single('recipeImage'), async (req, res) => {
+    try {
+      const { author, recipeName, ingredients, instructions } = req.body;
+      const imagePath = req.file ? req.file.path : null;
+  
+      let recipe = await Recipe.findById(req.params.recipeID);
+      if (!recipe) {
+        return res.status(404).json({ message: 'Recipe not found' });
+      }
+  
+      recipe.author = author;
+      recipe.recipeName = recipeName;
+      recipe.ingredients = ingredients;
+      recipe.instructions = instructions;
+      recipe.imagePath = imagePath || recipe.imagePath; // Preserve existing image if not updated
+  
+      await recipe.save();
+      res.json({ message: 'Recipe updated successfully', recipe });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
+  
+  // DELETE route to delete a recipe by ID
+  app.delete('/recipes/:recipeID', async (req, res) => {
+    try {
+      const recipe = await Recipe.findByIdAndDelete(req.params.recipeID);
+      if (!recipe) {
+        return res.status(404).json({ message: 'Recipe not found' });
+      }
+      res.json({ message: 'Recipe deleted successfully' });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  });
 app.listen(5000, () => {
     console.log("Server is running .....");
 });

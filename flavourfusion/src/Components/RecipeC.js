@@ -1,21 +1,24 @@
-// RecipeForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { RecipeContext } from '../App'; // Adjust the import path if necessary
 
-
-const RecipeForm = ({ open, userID, setCloseForm}) => {
+const RecipeForm = ({ open, userID, setCloseForm, recipeToEdit }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
     const [image, setImage] = useState(null);
-    
-    // const { setRecipeID } = useContext(RecipeContext);
+
+    useEffect(() => {
+        if (recipeToEdit) {
+            setRecipeName(recipeToEdit.recipeName);
+            setIngredients(recipeToEdit.ingredients);
+            setInstructions(recipeToEdit.instructions);
+        }
+    }, [recipeToEdit]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const formData = new FormData();
-        formData.append('Author', userID); ;
+        formData.append('Author', userID);
         formData.append('recipeName', recipeName);
         formData.append('ingredients', ingredients);
         formData.append('instructions', instructions);
@@ -24,14 +27,21 @@ const RecipeForm = ({ open, userID, setCloseForm}) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/submit-recipe', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            let response;
+            if (recipeToEdit) {
+                response = await axios.put(`http://localhost:5000/recipes/${recipeToEdit._id}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            } else {
+                response = await axios.post('http://localhost:5000/submit-recipe', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            }
             console.log(response.data);
-            // setRecipeID(response.data.recipe._id); // Set the recipe ID in the context
-            // console.log('Recipe ID:', response.data.recipe._id);
             setCloseForm(false);
         } catch (error) {
             console.error('Error submitting recipe:', error);
@@ -52,10 +62,10 @@ const RecipeForm = ({ open, userID, setCloseForm}) => {
             {open && (
                 <div className="card" style={{ width: '100%', maxWidth: '600px', margin: 'auto' }}>
                     <div className="card-body">
-                        <h5 className="card-title">Submit Your Recipe</h5>
+                        <h5 className="card-title">{recipeToEdit ? 'Edit Recipe' : 'Submit Your Recipe'}</h5>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label htmlFor="recipeName" className="form-label">Recipe Name:Give attractive name to your recipe</label>
+                                <label htmlFor="recipeName" className="form-label">Recipe Name:</label>
                                 <input
                                     type="text"
                                     id="recipeName"
@@ -102,7 +112,7 @@ const RecipeForm = ({ open, userID, setCloseForm}) => {
                                 ></textarea>
                             </div>
                             <div className="d-flex justify-content-between">
-                                <button type="submit" className="btn btn-primary">Submit</button>
+                                <button type="submit" className="btn btn-primary">{recipeToEdit ? 'Update' : 'Submit'}</button>
                                 <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
                             </div>
                         </form>
