@@ -1,10 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react';
+import './Myprofile.css'; // Import your CSS file for styling
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RecipeForm from './RecipeC';
 import { store } from '../App';
+import '@fortawesome/react-fontawesome';
 
-const MyProfile = () => {
+
+
+
+const  MyProfile = () => {
   const navigate = useNavigate();
   const [token, setToken] = useContext(store);
   const [data, setData] = useState(null);
@@ -13,6 +18,7 @@ const MyProfile = () => {
   const [ProfileData, setProfileData] = useState('');
   const [userRecipes, setUserRecipes] = useState([]);
   const [showRecipes, setShowRecipes] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +32,7 @@ const MyProfile = () => {
             }
           });
           setData(response.data);
+          // console.log(response.data)
           if (!token) {
             setToken(storedToken);
           }
@@ -44,6 +51,7 @@ const MyProfile = () => {
   useEffect(() => {
     if (data) {
       setUserID(data._id);
+
     }
   }, [data]);
 
@@ -97,96 +105,183 @@ const MyProfile = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-      {data && (
-        <div style={{ width: '50%', padding: '40px' }}>
-          <div className="card mb-3" style={{ borderRadius: '.5rem', background: '#fffffb', boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.5)' }}>
-            <div className="row g-0">
-              <div className="col-md-12 text-center text-white mb-3" style={{ background: 'linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))', borderRadius: '.5rem 0 0 .5rem', padding: '20px' }}>
-                <img src={ProfileData.profileImage} alt="Avatar" className="img-fluid my-3" style={{ width: '120px', borderRadius: '50%' }} />
-                <center>{ProfileData.username}</center>
-                <div className="d-flex justify-content-center">
-                  <a href={ProfileData.socialMedia?.facebook} style={{ marginRight: '20px' }}><i className="fab fa-facebook-f fa-lg"></i></a>
-                  <a href={ProfileData.socialMedia?.twitter} style={{ marginRight: '20px' }}><i className="fab fa-twitter fa-lg"></i></a>
-                  <a href={ProfileData.socialMedia?.instagram}><i className="fab fa-instagram fa-lg"></i></a>
-                </div>
-                <div className="text-center mt-4">
-                  <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-                  <a onClick={handleEditProfile} className="btn btn-dark btn-sm btn-block">Edit profile</a>
-                </div>
-              </div>
-              <div className="col-md-12">
-                <div className="card-body p-4">
-                  <h6>Information</h6>
-                  <p>ID: {data._id}</p>
-                  <hr className="mt-0 mb-4" />
-                  <div className="row pt-1">
-                    <div className="col-6 mb-3">
-                      <h6>Email</h6>
-                      <p className="text-muted">{data.email}</p>
-                    </div>
-                    <div className="col-6 mb-3">
-                      <h6>Recipes</h6>
-                      <p className="text-muted">{ProfileData.recipeCount}</p>
-                    </div>
-                  </div>
-                  <hr className="mt-0 mb-4" />
-                  <div className="row pt-1">
-                    <div className="col-6 mb-3">
-                      <h6>Followers</h6>
-                      <p className="text-muted">{ProfileData.followersCount}</p>
-                    </div>
-                    <div className="col-6 mb-3">
-                      <h6>Ratings</h6>
-                      <p className="text-muted">{ProfileData.ratings}</p>
-                    </div>
-                  </div>
-                  <div className="text-center mt-4">
-                    <button className="btn btn-danger" onClick={handleRecipe}>Add your own recipe</button>
-                  </div>
-                </div>
-              </div>
+    <div className="container">
+      <div class="inner">
+        <section id="banner">
+          <div className="content">
+            <header>
+              <h1>Welcome to Flavour Fusion, {ProfileData.username}!</h1>
+              <p>Setup profile here:
+                <a 
+                  onClick={handleEditProfile} 
+                  className="btn-sm btn-block" 
+                  style={{ color: '#f56a6a' }}
+                >
+                  Edit profile
+                </a>
+              </p>
+            </header>
+            <p>Welcome to your FavourFusion, where culinary creativity meets community! This is your space to explore, create, and share your favorite fusion recipes. Whether you're combining flavors from around the world or adding your own unique twist to traditional dishes, the possibilities are endless. Dive in and start by creating your own recipes to inspire others. Engage with fellow chefs by commenting on their creations, offering tips, and rating recipes you've tried. Don't forget to explore and follow recipes that pique your interest—you never know what delicious inspiration awaits! Together, let's celebrate the joy of cooking and sharing wonderful flavors.</p>
+            <div className="text-center mt-4">
+              <button className="button big" onClick={handleRecipe}>Add your own recipe</button>
             </div>
-            <div className="card-body p-4">
-              <h4 className="mt-4">Your Recipes</h4>
-              {showRecipes && (
-                <div>
-                  {userRecipes.length > 0 ? (
-                    userRecipes.map(recipe => (
-                      <div key={recipe._id} className="card mb-3">
-                        <div className="card-body d-flex justify-content-between align-items-center">
-                          <h5 className="card-title mb-0">{recipe.recipeName}</h5>
-                          <div>
-                            <button className="btn btn-sm btn-primary mr-2" style={{ fontSize: '0.8rem'}} onClick={() => handleEditRecipe(recipe._id)}>Edit</button>
-                            <button className="btn btn-sm btn-danger" style={{ fontSize: '0.8rem'}} onClick={() => handleDeleteRecipe(recipe._id)}>Delete</button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
+          </div>
+          <span className="image object">
+            <img src={ProfileData.profileImage} alt="" />
+            <div className="text-center mt-6">
+              <center>
+                <button className="button big"
+                  style={{ marginTop: '10px' }} 
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </center>
+            </div>
+          </span>
+        </section>
+        
+        <section>
+          <header className="major">
+            <h2>Information</h2>
+          </header>
+          <div className="features">
+            <article>
+              <span className="icon fas fa-heart"></span>
+              <div className="content">
+                <h3>Followers</h3>
+                <p><strong>{ProfileData.followersCount}</strong></p>
+              </div>
+            </article>
+            <article>
+              <span className="icon fas fa-star"></span>
+              <div className="content">
+                <h3>Ratings</h3>
+                <p><strong>{ProfileData.ratings}</strong></p>
+              </div>
+            </article>
+            <article>
+            <span className="icon solid fa-signal"></span> 
+                <div className="content">
+                <h3>No of recipes</h3>
+                <p><strong>{ProfileData.recipeCount}</strong></p>
+              </div>
+            </article>
+            {data && (
+            <article>
+            <span className="icon fas fa-envelope"></span>
+              <div className="content">
+                <h3>Email</h3>
+                <p>{data.email}</p>
+              </div>
+            </article>
+            )}
+          </div>
+        </section>
+        <section>
+  <header className="major">
+    <h2>Your Recipes</h2>
+  </header>
+  {userRecipes.length > 0 ? (
+    <div className="posts">
+      {userRecipes.map(recipe => (
+        <article key={recipe._id}>
+          <a href="#" className="image">
+            <img 
+              src={recipe.imagePath} 
+              alt="" 
+              style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+            />
+          </a>
+          <h3>{recipe.recipeName}</h3>
+          {/* <p>{recipe.description}</p> */}
+          <ul className="actions">
+            <li><a href="#" className="button" onClick={() => handleEditRecipe(recipe._id)}>Edit</a></li>
+            <li><a href="#" className="button" onClick={() => handleDeleteRecipe(recipe._id)}>Delete</a></li>
+          </ul>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p>No recipes found.</p>
+  )}
+</section>
+
+
+        {/* <section>
+        <header className="major">
+          <h2>Your Recipes</h2>
+        </header>
+        {userRecipes.length > 0 ? (
+        userRecipes.map(recipe => (
+        <div className="posts">
+          <article>
+            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
+            <h3>Interdum aenean</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+            <li><a href="#" className="button" onClick={() => handleEditRecipe()}>Edit</a></li>
+            <li><a href="#" className="button" onClick={() => handleDeleteRecipe()}>Delete</a></li>
+            </ul>
+          </article>
+        ))
                   ) : (
                     <p>No recipes found.</p>
                   )}
-                </div>
-              )}
-              {!showRecipes && (
-                <button className="btn btn-primary" onClick={toggleRecipes}>Show Recipes</button>
-              )}
-            </div>
-          </div>
+                  </div>
+          <article>
+            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
+            <h3>Nulla amet dolore</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+              <li><a href="#" className="button">More</a></li>
+            </ul>
+          </article>
+          <article>
+            <a href="#" className="image"><img src="images/pic03.jpg" alt="" /></a>
+            <h3>Tempus ullamcorper</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+              <li><a href="#" className="button">More</a></li>
+            </ul>
+          </article>
+          <article>
+            <a href="#" className="image"><img src="images/pic04.jpg" alt="" /></a>
+            <h3>Sed etiam facilis</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+              <li><a href="#" className="button">More</a></li>
+            </ul>
+          </article>
+          <article>
+            <a href="#" className="image"><img src="images/pic05.jpg" alt="" /></a>
+            <h3>Feugiat lorem aenean</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+              <li><a href="#" className="button">More</a></li>
+            </ul>
+          </article>
+          <article>
+            <a href="#" className="image"><img src="images/pic06.jpg" alt="" /></a>
+            <h3>Amet varius aliquam</h3>
+            <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+            <ul className="actions">
+              <li><a href="#" className="button">More</a></li>
+            </ul>
+          </article>
         </div>
-      )}
-
+      </section> */}
+      </div>
       {showForm && userID && (
-        <div style={{ width: '50%', padding: '40px' }}>
-          <div className="card mb-3" style={{ borderRadius: '.5rem', background: '#fffffb', boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.5)' }}>
-            <div className="card-body p-4">
-              <RecipeForm open={true} userID={userID} setCloseForm={handleCloseForm} />
-            </div>
+        <div className="overlay" >
+          <div className="form-container" style={modalPosition}>
+            {/* <button className="close-btn" onClick={handleCloseForm}>Close</button> */}
+            <RecipeForm open={true} userID={userID} setCloseForm={handleCloseForm} />
           </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default MyProfile;
