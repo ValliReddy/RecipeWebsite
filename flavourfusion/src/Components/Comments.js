@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { store } from '../App';
@@ -11,6 +11,20 @@ const CommentSection = () => {
   const [comment, setComment] = useState('');
   const navigate = useNavigate();
   const [token] = useContext(store);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    fetchComments(); // Initial fetch of comments when component mounts
+  }, []);
+
+  const fetchComments = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/comments/${recipeID}`);
+      setComments(response.data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
 
   const handleStarClick = (value) => {
     setRating(value);
@@ -35,7 +49,8 @@ const CommentSection = () => {
         },
       });
 
-      // Optionally handle success
+      // After successfully adding a comment, fetch comments again to update the list
+      await fetchComments();
 
       setComment('');
       setRating(0);
@@ -71,7 +86,10 @@ const CommentSection = () => {
         </div>
         <button type="submit" className="submit-comment">Post Comment</button>
       </form>
-      <CommentDisplay recipeID={recipeID} />
+      <CommentDisplay
+        comments={comments}
+        setComments={setComments} // Pass setComments function to update comments
+      />
     </div>
   );
 };

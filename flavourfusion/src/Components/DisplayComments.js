@@ -1,33 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-// import { RecipeContext } from '../App';
 import ReplyForm from './ReplyForm';
 
-const CommentDisplay = ({ recipeID }) => {
-  const [comments, setComments] = useState([]);
+const CommentDisplay = ({ comments, setComments }) => {
   const [replyingCommentId, setReplyingCommentId] = useState(null);
   const [repliesVisible, setRepliesVisible] = useState({});
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/comments/${recipeID}`);
-        setComments(response.data);
-        // Initialize replies visibility state for each comment
-        const initialRepliesVisibleState = {};
-        response.data.forEach(comment => {
-          initialRepliesVisibleState[comment._id] = false;
-        });
-        setRepliesVisible(initialRepliesVisibleState);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-    };
-
-    if (recipeID) {
-      fetchComments();
-    }
-  }, [recipeID]);
 
   const renderStars = (rating) => {
     const stars = [];
@@ -72,13 +49,17 @@ const CommentDisplay = ({ recipeID }) => {
           
           <strong><a onClick={() => handleReplyClick(comment._id)}>Reply</a></strong>
           {replyingCommentId === comment._id && (
-            <ReplyForm commentId={comment._id} recipeID={recipeID} setReplyingCommentId={setReplyingCommentId} />
+            <ReplyForm
+              commentId={comment._id}
+              setReplyingCommentId={setReplyingCommentId}
+              setComments={setComments} // Pass setComments function to update comments
+            />
           )}
           {/* Display replies only if repliesVisible[comment._id] is true */}
           {repliesVisible[comment._id] && (
-            <div className="replies">
+            <div style={{ fontSize: '0.9em', marginLeft: '20px' }}>
               {comment.replies.map((reply) => (
-                <div key={reply._id} className="reply">
+                <div key={reply._id} style={{ marginTop: '10px', padding: '5px', background: 'FFF0F5', borderLeft: '2px solid #ddd' }}>
                   <p>
                     <strong>{reply.user.username}</strong> replied:
                   </p>
