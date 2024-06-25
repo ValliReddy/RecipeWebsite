@@ -111,7 +111,9 @@ app.get('/myprofile', middleware, async (req, res) => {
 app.get('/comments/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const comments = await Comment.find({ recipe: id }).populate('user', 'username');
+        const comments = await Comment.find({ recipe: id })
+            .populate('user', 'username')
+            .populate('replies.user', 'username'); // Populate user field in replies
         res.json(comments);
     } catch (err) {
         console.error(err.message);
@@ -121,23 +123,47 @@ app.get('/comments/:id', async (req, res) => {
 
 app.post('/comments', middleware, async (req, res) => {
     try {
-        const { recipe, content, rating } = req.body; // Include rating in the request body
+        const { recipe, content, rating } = req.body;
         const newComment = new Comment({
-            // recipe:req.recipe.id,
             recipe,
             user: req.user.id,
             content,
-            rating // Save the rating
+            rating
         });
         await newComment.save();
 
-        // Send the ID of the newly created comment in the response
         res.status(201).json({ commentId: newComment._id, message: 'Comment added successfully' });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
 });
+
+app.post('/comments/:id/replies', middleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        const comment = await Comment.findById(id);
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        const reply = {
+            user: req.user.id,
+            content
+        };
+
+        comment.replies.push(reply);
+        await comment.save();
+
+        res.status(201).json({ message: 'Reply added successfully', replyId: reply._id });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 // Submit a new recipe endpoint
 app.post('/submit-recipe', upload.single('recipeImage'), async (req, res) => {

@@ -20,6 +20,11 @@ const CommentSchema = new mongoose.Schema({
     max: 5,
     required: true
   },
+  replies: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'RegisterUser' },
+    content: String,
+    createdAt: { type: Date, default: Date.now }
+  }],
   createdAt: {
     type: Date,
     default: Date.now
