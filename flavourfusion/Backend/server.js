@@ -1,11 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken'); // Ensure you have jwt installed
+const nodemailer = require('nodemailer'); // Ensure you have nodemailer installed
+const crypto = require('crypto');
 const cors = require('cors');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const middleware = require('./middleware');
+require('dotenv').config();
 
 
 const RegisterUser = require('./models/RegisterUser');
@@ -17,7 +21,15 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    // debug: true, // Enable debug output
+    // logger: true // Log the actual delivery details to console
+});
 
 mongoose.connect("mongodb+srv://vallirani:NewPass@cluster0.ykmsdrg.mongodb.net/React-nodeDB?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("DB connected successfully"));
@@ -48,27 +60,29 @@ app.post('/register', async (req, res) => {
         const { username, email, password, confirmPassword } = req.body;
         let exist = await RegisterUser.findOne({ email: email });
         if (exist) {
-            return res.status(400).send('User Already Exist');
+            return res.status(400).send('User Already Exists');
         }
         if (password !== confirmPassword) {
-            return res.status(400).send('Passwords are not matching');
+            return res.status(400).send('Passwords do not match');
         }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
         let newUser = new RegisterUser({
             username,
             email,
-            password,
-            confirmPassword
+            password: hashedPassword,
+            confirmPassword: hashedPassword // This field should be removed in a real application
         });
         await newUser.save();
         res.status(200).send('Registered Successfully');
-        // res.status(200).json(newUser._id);
-        
     } catch (err) {
         console.log(err);
         return res.status(500).send('Internal server error');
     }
 });
 
+// Login route
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -76,7 +90,8 @@ app.post('/login', async (req, res) => {
         if (!exist) {
             return res.status(400).send('User not found');
         }
-        if (exist.password !== password) {
+        const isMatch = await bcrypt.compare(password, exist.password);
+        if (!isMatch) {
             return res.status(400).send('Invalid credentials');
         }
         let payload = {
@@ -361,6 +376,74 @@ app.put('/recipes/:recipeID', upload.single('recipeImage'), async (req, res) => 
       res.status(500).send('Server Error');
     }
   });
+
+
+
+  app.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        let user = await RegisterUser.findOne({ email: email });
+        if (!user) {
+            return res.status(400).send('User not found');
+        }
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const otpExpiry = Date.now() + 3600000; // 1 hour expiry
+
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
+        await user.save();
+
+        let mailOptions = {
+            from: process.env.EMAIL_USER, // replace with your email
+            to: email,
+            subject: 'Password Reset OTP',
+            text: `Your OTP for password reset is ${otp}`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return res.status(500).send('Error sending email');
+            } else {
+                res.status(200).send('OTP sent to email');
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Server Error');
+    }
+});
+
+app.post('/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword, confirmNewPassword } = req.body;
+
+        let user = await RegisterUser.findOne({ email: email });
+        if (!user) {
+            return res.status(400).send('User not found');
+        }
+        if (user.otp !== otp || Date.now() > user.otpExpiry) {
+            return res.status(400).send('Invalid or expired OTP');
+        }
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).send('Passwords do not match');
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        user.otp = null; // Clear OTP
+        user.otpExpiry = null; // Clear OTP expiry
+        await user.save();
+
+        res.status(200).send('Password reset successfully');
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Server Error');
+    }
+});
+
 app.listen(5000, () => {
     console.log("Server is running .....");
 });

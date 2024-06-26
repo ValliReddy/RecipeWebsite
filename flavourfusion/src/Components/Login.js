@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react';
-import './SignUp.css'; // Import the CSS file
 import axios from 'axios';
 import { store } from '../App';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -98,7 +97,7 @@ const LoginForm = () => {
           />
         </div>
         {error && <p className="error">{error}</p>}
-        <p className="forgot"><a href="#">Forgot Password?</a></p>
+        <p className="forgot"><Link to="/forgot-password">Forgot Password?</Link></p>
         <button type="submit" className="button button-block">Log In</button>
       </form>
     </div>

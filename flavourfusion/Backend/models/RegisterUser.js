@@ -14,9 +14,13 @@ const RegisterUserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  confirmPassword: {
+  otp: {
     type: String,
-    required: true,
+    default: null
+  },
+  otpExpiry: {
+    type: Date,
+    default: null
   }
 });
 

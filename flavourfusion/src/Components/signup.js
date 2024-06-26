@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './SignUp.css'; // Import the CSS file
 import axios from 'axios';
-
+import { useNavigate, Link } from 'react-router-dom';
 
 const SignUpForm = () => {
+  const navigate = useNavigate();
   const [formFields, setFormFields] = useState({
     username: '',
     email: '',
@@ -11,6 +12,7 @@ const SignUpForm = () => {
     confirmPassword: '',
   });
   const [highlightedFields, setHighlightedFields] = useState({});
+  const [passwordError, setPasswordError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,8 +42,42 @@ const SignUpForm = () => {
     }));
   };
 
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long.';
+    }
+    // You can add more conditions like requiring uppercase, lowercase, digits, special characters, etc.
+    // Example conditions:
+    // if (!password.match(/[A-Z]/)) {
+    //   return 'Password must contain at least one uppercase letter.';
+    // }
+    // if (!password.match(/[a-z]/)) {
+    //   return 'Password must contain at least one lowercase letter.';
+    // }
+    // if (!password.match(/[0-9]/)) {
+    //   return 'Password must contain at least one digit.';
+    // }
+    // if (!password.match(/[!@#$%^&*(),.?":{}|<>]/)) {
+    //   return 'Password must contain at least one special character.';
+    // }
+    return '';
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
+    const { password, confirmPassword } = formFields;
+    
+    // Validate password
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setPasswordError(passwordError);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+    
     axios.post("http://localhost:5000/register", formFields)
       .then(res => {
         alert(res.data);
@@ -51,8 +87,9 @@ const SignUpForm = () => {
           email: '',
           password: '',
           confirmPassword: '',
-
         });
+        setPasswordError('');
+        navigate('/login');
       })
       .catch(err => {
         console.error(err);
@@ -126,6 +163,7 @@ const SignUpForm = () => {
             autoComplete="off"
           />
         </div>
+        {passwordError && <p className="error">{passwordError}</p>}
         <button type="submit" className="button button-block">Get Started</button>
       </form>
     </div>

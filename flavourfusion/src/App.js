@@ -11,7 +11,8 @@ import MyProfile from './Components/myprofile';
 import All from './Components/AllRecipe';
 import EditProfile from './Components/EditProfile';
 // import MyprofileNew from './Components/new';
-
+import ForgotPasswordForm from './Components/ForgotPassword';
+import ResetPasswordForm from './Components/ResetPassword';
 export const store = createContext();
 export const RecipeContext = createContext();
 
@@ -43,6 +44,8 @@ const App = () => {
               <Route path="/myprofile" element={<MyProfile/>} />
               <Route path="/all" element={<All />} />
               <Route path="/editprofile" element={<EditProfile/>} />
+              <Route path="/forgot-password" element={<ForgotPasswordForm/>} />
+              <Route path="/reset-password" element={<ResetPasswordForm/>} />
               {/* <Route path="/newprofile" element={<MyprofileNew/>} /> */}
             </Routes>
             <Footer />
