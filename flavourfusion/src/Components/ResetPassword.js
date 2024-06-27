@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Notification from './Notification';
 
 const ResetPasswordForm = () => {
   const [email, setEmail] = useState('');
@@ -7,6 +8,7 @@ const ResetPasswordForm = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [notificationKey, setNotificationKey] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -15,13 +17,27 @@ const ResetPasswordForm = () => {
     else if (name === 'newPassword') setNewPassword(value);
     else if (name === 'confirmNewPassword') setConfirmPassword(value);
   };
-//   console.log(newPassword,confirmPassword)
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Password validation checks
+    if (newPassword.length < 8) {
+      setMessage('Password must be at least 8 characters long.');
+      setNotificationKey(prevKey => prevKey + 1);
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setMessage('Passwords do not match.');
+      setNotificationKey(prevKey => prevKey + 1);
+      return;
+    }
+    // Additional password complexity rules can be added here (e.g., uppercase, lowercase, digits, special characters)
+
     axios.post('http://localhost:5000/reset-password', { email, otp, newPassword, confirmNewPassword })
       .then(res => {
         setMessage('Password reset successful. You can now log in with your new password.');
+        setNotificationKey(prevKey => prevKey + 1);
         setOtp('');
         setNewPassword('');
         setConfirmPassword('');
@@ -29,9 +45,9 @@ const ResetPasswordForm = () => {
       .catch(err => {
         console.error(err);
         setMessage('Failed to reset password. Please try again.');
+        setNotificationKey(prevKey => prevKey + 1);
       });
   };
-  
 
   return (
     <div className="form">
@@ -71,7 +87,12 @@ const ResetPasswordForm = () => {
         />
         <button className="button button-block" type="submit">Reset Password</button>
       </form>
-      {message && <p>{message}</p>}
+      {message && (
+        <Notification
+          key={notificationKey}
+          message={message}
+        />
+      )}
     </div>
   );
 };

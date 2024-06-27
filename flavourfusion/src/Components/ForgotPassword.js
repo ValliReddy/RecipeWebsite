@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Notification from './Notification';
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [notificationKey, setNotificationKey] = useState(0);
 
   const handleInputChange = (e) => {
     setEmail(e.target.value);
@@ -14,6 +16,7 @@ const ForgotPasswordForm = () => {
     axios.post('http://localhost:5000/forgot-password', { email })
       .then(res => {
         setMessage('Check your email for the OTP.');
+        setNotificationKey(prevKey => prevKey + 1);
         // Optionally, handle redirection after showing the message
         setTimeout(() => {
           window.location.href = '/reset-password'; // Redirect to reset password page
@@ -22,6 +25,7 @@ const ForgotPasswordForm = () => {
       .catch(err => {
         console.error(err);
         setMessage('Failed to initiate password reset.');
+        setNotificationKey(prevKey => prevKey + 1);
       });
   };
 
@@ -38,7 +42,12 @@ const ForgotPasswordForm = () => {
         />
         <button className="button button-block" type="submit">Send OTP</button>
       </form>
-      {message && <p>{message}</p>}
+      {message && (
+          <Notification
+            key={notificationKey}
+            message={message}
+          />
+        )}
     </div>
   );
 };

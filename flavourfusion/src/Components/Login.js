@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { store } from '../App';
 import { useNavigate, Link } from 'react-router-dom';
+import Notification from './Notification';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -11,7 +12,8 @@ const LoginForm = () => {
     password: '',
   });
   const [highlightedFields, setHighlightedFields] = useState({});
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [notificationKey, setNotificationKey] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -52,6 +54,7 @@ const LoginForm = () => {
           email: '',
           password: '',
         });
+        setNotificationKey(prevKey => prevKey + 1);
         // Redirect to myprofile page
         navigate('/myprofile');
       })
@@ -59,6 +62,7 @@ const LoginForm = () => {
         console.error(err);
         // Display error message to the user
         setError("Invalid email or password. Please try again.");
+        setNotificationKey(prevKey => prevKey + 1);
       });
   };
 
@@ -96,7 +100,12 @@ const LoginForm = () => {
             autoComplete="off"
           />
         </div>
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <Notification
+            key={notificationKey}
+            message={error}
+          />
+        )}
         <p className="forgot"><Link to="/forgot-password">Forgot Password?</Link></p>
         <button type="submit" className="button button-block">Log In</button>
       </form>

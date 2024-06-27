@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './SignUp.css'; // Import the CSS file
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Notification from './Notification';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const SignUpForm = () => {
   });
   const [highlightedFields, setHighlightedFields] = useState({});
   const [passwordError, setPasswordError] = useState('');
+  const [notificationKey, setNotificationKey] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,20 +48,6 @@ const SignUpForm = () => {
     if (password.length < 8) {
       return 'Password must be at least 8 characters long.';
     }
-    // You can add more conditions like requiring uppercase, lowercase, digits, special characters, etc.
-    // Example conditions:
-    // if (!password.match(/[A-Z]/)) {
-    //   return 'Password must contain at least one uppercase letter.';
-    // }
-    // if (!password.match(/[a-z]/)) {
-    //   return 'Password must contain at least one lowercase letter.';
-    // }
-    // if (!password.match(/[0-9]/)) {
-    //   return 'Password must contain at least one digit.';
-    // }
-    // if (!password.match(/[!@#$%^&*(),.?":{}|<>]/)) {
-    //   return 'Password must contain at least one special character.';
-    // }
     return '';
   };
 
@@ -71,10 +59,12 @@ const SignUpForm = () => {
     const passwordError = validatePassword(password);
     if (passwordError) {
       setPasswordError(passwordError);
+      setNotificationKey(prevKey => prevKey + 1);
       return;
     }
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match.');
+      setNotificationKey(prevKey => prevKey + 1);
       return;
     }
     
@@ -89,6 +79,7 @@ const SignUpForm = () => {
           confirmPassword: '',
         });
         setPasswordError('');
+        setNotificationKey(prevKey => prevKey + 1); // Ensure notification is reset
         navigate('/login');
       })
       .catch(err => {
@@ -163,7 +154,12 @@ const SignUpForm = () => {
             autoComplete="off"
           />
         </div>
-        {passwordError && <p className="error">{passwordError}</p>}
+        {passwordError && (
+          <Notification
+            key={notificationKey}
+            message={passwordError}
+          />
+        )}
         <button type="submit" className="button button-block">Get Started</button>
       </form>
     </div>
