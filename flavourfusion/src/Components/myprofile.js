@@ -5,6 +5,7 @@ import axios from 'axios';
 import RecipeForm from './RecipeC';
 import { store } from '../App';
 import '@fortawesome/react-fontawesome';
+import ConfirmationDialog from './ConfirmationDialog'; 
 
 const MyProfile = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const MyProfile = () => {
   const [showRecipes, setShowRecipes] = useState(false);
   const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
   const [recipeToEdit, setRecipeToEdit] = useState(null); // State to hold recipe data for editing
+  const [deleteRecipeID, setDeleteRecipeID] = useState(null); // State to hold the ID of recipe to delete
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,17 +107,22 @@ const MyProfile = () => {
     }
   };
 
-  const handleDeleteRecipe = async (recipeID) => {
-    if (window.confirm('Are you sure you want to delete this recipe?')) {
-      try {
-        await axios.delete(`http://localhost:5000/recipes/${recipeID}`);
-        setUserRecipes(userRecipes.filter(recipe => recipe._id !== recipeID));
-        console.log(`Recipe with ID ${recipeID} deleted successfully.`);
-      } catch (error) {
-        console.error('Error deleting recipe:', error);
-      }
+  const openDeleteConfirmation = (recipeID) => {
+    setDeleteRecipeID(recipeID);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirmation = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/recipes/${deleteRecipeID}`);
+      setUserRecipes(userRecipes.filter(recipe => recipe._id !== deleteRecipeID));
+      console.log(`Recipe with ID ${deleteRecipeID} deleted successfully.`);
+      setShowDeleteConfirmation(false); // Close confirmation dialog after successful deletion
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
     }
   };
+
 
   return (
     <div className="container">
@@ -208,8 +216,8 @@ const MyProfile = () => {
                   </a>
                   <h3>{recipe.recipeName}</h3>
                   <ul className="actions">
-                    <li><a href="#" className="button" onClick={() => handleEditRecipe(recipe._id)}>Edit</a></li>
-                    <li><a href="#" className="button" onClick={() => handleDeleteRecipe(recipe._id)}>Delete</a></li>
+                  <li><a href="#" className="button" onClick={() => handleEditRecipe(recipe._id)}>Edit</a></li>
+                    <li><a href="#" className="button" onClick={() => openDeleteConfirmation(recipe._id)}>Delete</a></li>
                   </ul>
                 </article>
               ))}
@@ -229,6 +237,13 @@ const MyProfile = () => {
         </div>
       )}
       
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        message="Are you sure you want to delete this recipe?"
+        onConfirm={handleDeleteConfirmation}
+        onCancel={() => setShowDeleteConfirmation(false)}
+      />
+
     </div>
   );
 }

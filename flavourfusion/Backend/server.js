@@ -388,7 +388,7 @@ app.put('/recipes/:recipeID', upload.single('recipeImage'), async (req, res) => 
         }
 
         const otp = crypto.randomInt(100000, 999999).toString();
-        const otpExpiry = Date.now() + 3600000; // 1 hour expiry
+        const otpExpiry = Date.now() + 600000; // 1 hour expiry
 
         user.otp = otp;
         user.otpExpiry = otpExpiry;
@@ -398,7 +398,17 @@ app.put('/recipes/:recipeID', upload.single('recipeImage'), async (req, res) => 
             from: process.env.EMAIL_USER, // replace with your email
             to: email,
             subject: 'Password Reset OTP',
-            text: `Your OTP for password reset is ${otp}`
+            html: `
+                    <div style="text-align: center;">
+                        <img style="max-width: 100%; height: auto;" src="https://img.icons8.com/clouds/100/food-bar.png" alt="Logo"/>
+                    </div>
+                    <p>We received a request to reset your password for your FavorFusion account.</p>
+                    <p>Your OTP Code: <strong>${otp}</strong></p>
+                    <p>This code is valid for the next 10 minutes.</p>
+                    <p>If you did not request this password reset, please ignore this email or contact our support team immediately.</p>
+                    <p>Stay safe!</p>
+                    <p>Best regards,<br>The FavorFusion Team</p>
+                `
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
