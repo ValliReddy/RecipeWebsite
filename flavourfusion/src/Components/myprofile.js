@@ -20,6 +20,7 @@ const MyProfile = () => {
   const [recipeToEdit, setRecipeToEdit] = useState(null); // State to hold recipe data for editing
   const [deleteRecipeID, setDeleteRecipeID] = useState(null); // State to hold the ID of recipe to delete
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +74,62 @@ const MyProfile = () => {
     }
   }, [userID]);
 
+
+  useEffect(() => {
+    // Function to calculate average rating
+    const calculateAverageRating = () => {
+      if (userRecipes.length === 0) {
+        setAverageRating(0);
+        return;
+      }
+  
+      let totalRating = 0;
+      userRecipes.forEach(recipe => {
+        totalRating += recipe.ratings; // Assuming each recipe has a 'rating' field
+      });
+  
+      const average = totalRating / userRecipes.length;
+      setAverageRating(average);
+    };
+  
+    // Call the calculateAverageRating function whenever userRecipes changes
+    calculateAverageRating();
+  }, [userRecipes]);
+  
+  // Render function to display the average rating
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < rating; i++) {
+      stars.push(<span key={`star-${i}`} className="star">&#9733;</span>);
+    }
+    return <div className="stars">{stars}</div>;
+  };
+
+  
+  useEffect(() => {
+    const handleRateProfile = async () => {
+      try {
+        // Round off averageRating to 1 decimal place
+        const roundedRating = Math.round(averageRating * 10) / 10;
+  
+        const response = await axios.post(`http://localhost:5000/editprofile/update-ratings`, {
+          userID: userID,
+          newRating: roundedRating,
+        });
+  
+        console.log('Response:', response.data); // Assuming you want to log the response for now
+        // Optionally, you can update UI or show a success message
+      } catch (error) {
+        console.error('Error rating profile:', error);
+        // Handle error, e.g., show error message to user
+      }
+    };
+  
+    handleRateProfile(); // Immediately call handleRateProfile on component mount or when rating changes
+  }, [averageRating]);
+
+
+  
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -89,7 +146,7 @@ const MyProfile = () => {
   };
 
   const handleEditProfile = () => {
-    navigate('/editprofile', { state: { userID: userID, ProfileData: ProfileData } });
+    navigate('/editprofile', { state: { userID: userID, ProfileData: ProfileData} });
   };
 
   const toggleRecipes = () => {
@@ -177,7 +234,7 @@ const MyProfile = () => {
               <span className="icon fas fa-star"></span>
               <div className="content">
                 <h3>Ratings</h3>
-                <p><strong>{ProfileData.ratings}</strong></p>
+                <p><strong>{renderStars(averageRating)}</strong></p>
               </div>
             </article>
             <article>

@@ -5,7 +5,7 @@ import { store } from '../App';
 import CommentDisplay from './DisplayComments';
 import { RecipeContext } from '../App';
 
-const CommentSection = () => {
+const CommentSection = ({ setAverageRating }) => {
   const { recipeID } = useContext(RecipeContext);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -14,8 +14,12 @@ const CommentSection = () => {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetchComments(); // Initial fetch of comments when component mounts
+    fetchComments();
   }, []);
+
+  useEffect(() => {
+    calculateAverageRating();
+  }, [comments]);
 
   const fetchComments = async () => {
     try {
@@ -24,6 +28,13 @@ const CommentSection = () => {
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
+  };
+
+  const calculateAverageRating = () => {
+    if (comments.length === 0) return;
+    const totalRating = comments.reduce((sum, comment) => sum + comment.rating, 0);
+    const average = totalRating / comments.length;
+    setAverageRating(average);
   };
 
   const handleStarClick = (value) => {
@@ -49,9 +60,7 @@ const CommentSection = () => {
         },
       });
 
-      // After successfully adding a comment, fetch comments again to update the list
       await fetchComments();
-
       setComment('');
       setRating(0);
     } catch (error) {
@@ -88,7 +97,7 @@ const CommentSection = () => {
       </form>
       <CommentDisplay
         comments={comments}
-        setComments={setComments} // Pass setComments function to update comments
+        setComments={setComments}
       />
     </div>
   );

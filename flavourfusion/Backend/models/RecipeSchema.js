@@ -18,6 +18,10 @@ const RecipeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    ratings: {
+        type: Number,
+        default: 0  // Initialize with default value if needed
+    },
     imagePath: {
         type: String,
         required: false

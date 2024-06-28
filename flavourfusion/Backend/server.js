@@ -454,6 +454,57 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
+
+app.post('/:recipeId/rate', async (req, res) => {
+    const { rating } = req.body;
+    const { recipeId } = req.params;
+    // console.log(rating)
+
+    try {
+        const recipe = await Recipe.findById(recipeId);
+
+        if (!recipe) {
+            return res.status(404).json({ message: 'Recipe not found' });
+        }
+
+        // Update ratings and save
+        recipe.ratings = rating;
+        await recipe.save();
+        // console.log(recipe)
+
+        res.status(200).json({ message: 'Rating updated successfully' });
+    } catch (error) {
+        console.error('Error updating rating:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
+app.post('/editprofile/update-ratings', async (req, res) => {
+    const { userID, newRating } = req.body;
+  
+    try {
+      // Find the EditProfile document for the given userID
+      let userProfile = await EditProfile.findOne({ userId: userID });
+  
+      if (!userProfile) {
+        return res.status(404).json({ error: 'User profile not found' });
+      }
+  
+      // Update the ratings field
+      userProfile.ratings = newRating; // Assuming newRating is the updated average rating
+  
+      // Save updated profile
+      await userProfile.save();
+  
+      res.status(200).json({ message: 'Ratings updated successfully' });
+    } catch (error) {
+      console.error('Error updating ratings:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
 app.listen(5000, () => {
     console.log("Server is running .....");
 });

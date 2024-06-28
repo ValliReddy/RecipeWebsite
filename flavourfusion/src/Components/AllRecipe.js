@@ -10,7 +10,7 @@ const All = () => {
   const { recipeID } = useContext(RecipeContext);
   const navigate = useNavigate();
   const componentRef = useRef();
-  const [token] = useContext(store); 
+  const [token] = useContext(store);
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,13 +30,13 @@ const All = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followButtonDisabled, setFollowButtonDisabled] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
 
   const fetchRecipe = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
-      setAuthorID(response.data.Author); //who writes recipe store authorid
-      console.log(response.data.Author)
+      setAuthorID(response.data.Author);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -50,12 +50,13 @@ const All = () => {
         const response = await axios.get(`http://localhost:5000/edit-profile/${authorID}`);
         setProfileData(response.data);
         setFollowersCount(response.data.followers);
-        setIsFollowing(response.data.isFollowing); // Assuming backend returns if current user is following
+        setIsFollowing(response.data.isFollowing);
       }
     } catch (error) {
       console.log(error.message);
     }
   };
+
   const handleFollow = async () => {
     try {
       const storedToken = token || localStorage.getItem('token');
@@ -82,7 +83,7 @@ const All = () => {
         setFollowersCount(response.data.followersCount);
         setFollowButtonDisabled(true);
       } else if (response.status === 400 && response.data.message === 'You have already followed this user') {
-        console.log('User is already following this profile'); // Optionally handle this case
+        console.log('User is already following this profile');
       } else {
         console.error('Unexpected response:', response);
       }
@@ -104,11 +105,35 @@ const All = () => {
     if (authorID) {
       fetchProfile();
     }
-  }, [authorID, isFollowing]); // Update when following status changes
+  }, [authorID, isFollowing]);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+  
+  useEffect(() => {
+    const handleRateRecipe = async () => {
+      try {
+        const response = await axios.post(`http://localhost:5000/${recipeID}/rate`, { rating :averageRating });
+        console.log('Response:', response.data); // Assuming you want to log the response for now
+        // Optionally, you can update UI or show a success message
+      } catch (error) {
+        console.error('Error rating recipe:', error);
+        // Handle error, e.g., show error message to user
+      }
+    };
+
+    handleRateRecipe(); // Immediately call handleRateRecipe on component mount or when rating changes
+  }, [averageRating, recipeID]);
+
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < rating; i++) {
+      stars.push(<span key={`star-${i}`} className="star">&#9733;</span>);
+    }
+    return <div className="stars">{stars}</div>;
+  };
+
 
   if (loading) {
     return <p><center><h4>Loading recipe...</h4></center></p>;
@@ -131,6 +156,7 @@ const All = () => {
             <span className="image main">
               <center><img src={recipe.imagePath} alt="Recipe Image" style={{ width: '50%', maxWidth: '700px' }} onError={(e) => console.log('Image Error:', e)} /></center>
             </span>
+            <h2 style={{ textAlign: 'left' }}>{renderStars(averageRating)}</h2>
             <h2>Ingredients:</h2>
             <ul>
               {recipe.ingredients.split('\r\n').map((ingredient, index) => (
@@ -150,7 +176,7 @@ const All = () => {
             Print Recipe
           </button>
           <h2>Leave a comment</h2>
-          <CommentSection />
+           <CommentSection setAverageRating={setAverageRating} />   {/*imp for passing set of variable to other componenet instead of varaible */}
         </div>
       </div>
       <div className="new-login-container">
@@ -168,7 +194,7 @@ const All = () => {
         <span className="label">Followers:</span> <span className="value">{profileData.followersCount}</span>
       </div>
       <div className="new-ratings">
-        <span className="label">Ratings:</span> <span className="value">{profileData.ratings}</span>
+        <span className="label">Ratings:</span> <span className="value">{renderStars(profileData.ratings)}</span>
       </div>
       <div className="social-icons">
         <a href={`https://www.instagram.com/${profileData.socialMedia.instagram}`} target="_blank" rel="noopener noreferrer">
