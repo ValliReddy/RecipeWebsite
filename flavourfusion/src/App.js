@@ -10,6 +10,7 @@ import Biryani from './Components/Biryani';
 import MyProfile from './Components/myprofile';
 import All from './Components/AllRecipe';
 import EditProfile from './Components/EditProfile';
+import Newsletter from './Components/Newsletter';
 // import MyprofileNew from './Components/new';
 import ForgotPasswordForm from './Components/ForgotPassword';
 import ResetPasswordForm from './Components/ResetPassword';
@@ -49,6 +50,7 @@ const App = () => {
               <Route path="/editprofile" element={<EditProfile/>} />
               <Route path="/forgot-password" element={<ForgotPasswordForm/>} />
               <Route path="/reset-password" element={<ResetPasswordForm/>} />
+              <Route path="/news-letter" element={<Newsletter/>} />
               {/* <Route path="/newprofile" element={<MyprofileNew/>} /> */}
             </Routes>
             <Footer />

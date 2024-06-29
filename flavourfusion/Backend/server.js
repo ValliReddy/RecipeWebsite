@@ -10,6 +10,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const middleware = require('./middleware');
 require('dotenv').config();
+const Newsletter=require('./models/NewsletterSchema');
 
 
 const RegisterUser = require('./models/RegisterUser');
@@ -502,6 +503,18 @@ app.post('/editprofile/update-ratings', async (req, res) => {
     } catch (error) {
       console.error('Error updating ratings:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/newsletter-signup', async (req, res) => {
+    const { name, email } = req.body;
+  
+    try {
+      const newUser = new Newsletter({ username: name, email: email });
+      await newUser.save();
+      res.status(201).json({ message: 'Signed up successfully!' });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
   });
 
