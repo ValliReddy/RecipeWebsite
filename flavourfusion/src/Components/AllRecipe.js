@@ -5,9 +5,11 @@ import axios from 'axios';
 import { RecipeContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { store } from '../App';
+import { SearchContext } from '../App';
 
 const All = () => {
   const { recipeID } = useContext(RecipeContext);
+  const { setSearchQuery } = useContext(SearchContext);
   const navigate = useNavigate();
   const componentRef = useRef();
   const [token] = useContext(store);
@@ -15,6 +17,7 @@ const All = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [authorID, setAuthorID] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
   const [profileData, setProfileData] = useState({
     username: '',
     followers: '',
@@ -31,6 +34,11 @@ const All = () => {
   const [followersCount, setFollowersCount] = useState(0);
   const [followButtonDisabled, setFollowButtonDisabled] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+
+  const toggleAccordion = () => {
+    setIsActive(!isActive);
+  };
 
   const fetchRecipe = async () => {
     try {
@@ -133,7 +141,26 @@ const All = () => {
     }
     return <div className="stars">{stars}</div>;
   };
+   
+  useEffect(() => {
+    const fetchUserRecipes = async () => {
+      try {
+        const recipesResponse = await axios.get(`http://localhost:5000/recipes/user/${authorID}`);
+        setUserRecipes(recipesResponse.data);
+      } catch (error) {
+        console.error("Error fetching user recipes:", error);
+      }
+    };
 
+    if (isActive) {
+      fetchUserRecipes();
+    }
+  }, [isActive, authorID]);
+
+  const handleRecipeClick = (recipeName) => {
+    navigate('/')
+    setSearchQuery(recipeName); // Set searchQuery to the clicked recipe's name
+  };
 
   if (loading) {
     return <p><center><h4>Loading recipe...</h4></center></p>;
@@ -187,9 +214,11 @@ const All = () => {
       <div className="new-description">
         {profileData.about}
       </div>
+      <div className="new-followers">
       <button onClick={handleFollow} disabled={followButtonDisabled}>
         {isFollowing ? 'Following' : 'Follow'}
       </button>
+      </div>
       <div className="new-followers">
         <span className="label">Followers:</span> <span className="value">{profileData.followersCount}</span>
       </div>
@@ -207,6 +236,33 @@ const All = () => {
           <i className="fab fa-facebook" style={{ color: '#1877F2' }}></i>
         </a>
       </div>
+      <div className="accordion-item">
+      <div className="new-ratings">
+        <span onClick={toggleAccordion} className="label">Explore</span> 
+      </div>
+      {isActive && (
+        <div className="accordion-content">
+          <p className="new-description"  >Other recipes of {profileData.username} that you make like</p>
+          <ul className="new-description">
+            {userRecipes
+              .filter(recipe => recipe._id !== recipeID)
+              .map(filteredRecipe => (
+                <li 
+                  key={filteredRecipe._id} 
+                  className="recipe-item"
+                  onClick={() => handleRecipeClick(filteredRecipe.recipeName)}
+                > 
+                  <img className='new-userecipe-container'
+              src={filteredRecipe.imagePath}
+              alt={filteredRecipe.recipeName}
+            />
+                  {filteredRecipe.recipeName}
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+    </div>
     </div>
 
     </div>

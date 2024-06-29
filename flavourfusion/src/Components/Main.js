@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { RecipeContext } from '../App';
 import { FaSearch } from 'react-icons/fa'; // Import search icon
-
+import { SearchContext } from '../App';
 
 const MainContent = () => {
   const [recipes, setRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const { setRecipeID } = useContext(RecipeContext);
+  const { searchQuery: contextSearchQuery, setSearchQuery: setContextSearchQuery } = useContext(SearchContext);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -24,15 +25,21 @@ const MainContent = () => {
     fetchRecipes();
   }, []);
 
+  useEffect(() => {
+    // Filter recipes based on context search query
+    const filtered = recipes.filter((recipe) =>
+      recipe.recipeName.toLowerCase().includes(contextSearchQuery.toLowerCase())
+    );
+    setFilteredRecipes(filtered);
+  }, [contextSearchQuery, recipes]);
+
   const handleRecipeClick = (id) => {
     setRecipeID(id);
   };
 
   const handleSearch = () => {
-    const filtered = recipes.filter((recipe) =>
-      recipe.recipeName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredRecipes(filtered);
+    // Update context search query with input search query
+    setContextSearchQuery(searchQuery);
   };
 
   return (

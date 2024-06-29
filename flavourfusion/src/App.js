@@ -14,12 +14,14 @@ import EditProfile from './Components/EditProfile';
 import ForgotPasswordForm from './Components/ForgotPassword';
 import ResetPasswordForm from './Components/ResetPassword';
 export const store = createContext();
+export const SearchContext = createContext();
 export const RecipeContext = createContext();
 
 
 const App = () => {
   const [token, setToken] = useState(null);
   const [recipeID, setRecipeID] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   
 
   useEffect(() => {
@@ -34,6 +36,7 @@ const App = () => {
       <div id="wrapper">
         <store.Provider value={[token, setToken]}>
           <RecipeContext.Provider value={{ recipeID, setRecipeID }}>
+          <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>
            
             <Header token={token} />
             <Routes>
@@ -49,7 +52,7 @@ const App = () => {
               {/* <Route path="/newprofile" element={<MyprofileNew/>} /> */}
             </Routes>
             <Footer />
-           
+           </SearchContext.Provider>
           </RecipeContext.Provider>
         </store.Provider>
       </div>

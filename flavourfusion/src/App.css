@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Sriracha&display=swap');
 
 /* Add the following CSS to position #login-container on the right side */
+.new-userecipe-container {
+  width: 200px;
+  /* padding: 20px;  */
+  border-radius: 10px; 
+  background: #fffffb;
+  position: center; 
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); 
+}
 .custom-h1 {
   font-family: 'Sriracha', cursive, arial, sans-serif;
   color: #ffc145; /* Adjust accent color */
