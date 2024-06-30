@@ -506,17 +506,114 @@ app.post('/editprofile/update-ratings', async (req, res) => {
     }
   });
 
-  app.post('/api/newsletter-signup', async (req, res) => {
-    const { name, email } = req.body;
-  
+  app.get('/highest-rated-recipe', async (req, res) => {
     try {
-      const newUser = new Newsletter({ username: name, email: email });
-      await newUser.save();
-      res.status(201).json({ message: 'Signed up successfully!' });
+      // Fetch all recipes from MongoDB
+      const recipes = await Recipe.find();
+  
+      // Determine the highest-rated recipe
+      let maxRecipe = null;
+      let maxRecipeRating = -Infinity;
+      recipes.forEach(recipe => {
+        const recipeRating = recipe.ratings; // Assuming ratings is a single number
+        if (typeof recipeRating === 'number') {
+          if (recipeRating > maxRecipeRating) {
+            maxRecipe = recipe;
+            maxRecipeRating = recipeRating;
+          }
+        }
+      });
+  
+      if (maxRecipe) {
+        console.log(`Highest rated recipe: ${maxRecipe.recipeName}`);
+  
+        // Send email with recipe details
+        await sendEmail(maxRecipe);
+        
+        res.json({ highestRatedRecipe: maxRecipe });
+      } else {
+        res.status(404).json({ error: 'No recipes found or error fetching data.' });
+      }
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error('Error fetching recipes:', error);
+      res.status(500).json({ error: 'Error fetching recipes. Please try again later.' });
     }
   });
+  
+  // Function to send email with recipe details
+  async function sendEmail(recipe) {
+    try {
+      // Use transporter to send mail with defined transport object
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER, // Sender address
+        to: 'random.gmail.com', // List of recipients
+        subject: `Highest Rated Recipe: ${recipe.recipeName}`, // Subject line (make instruction proper line wise) hpw to trigeer this without frontend very week 
+        html: `
+        <div style="text-align: center;">
+                        <img style="max-width: 100%; height: auto;" src="https://img.icons8.com/clouds/100/food-bar.png" alt="Logo"/>
+                    </div>
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="text-align: center;">Welcome to Favour Fusion!</h1>
+                    <p style="font-size: 16px;">People loved this recipe! You should try this delicious dish:</p>
+                    <h2 style="text-align: center;">${recipe.recipeName}</h2>
+                    <img src="${recipe.imagePath}" alt="Recipe Image" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 400px;" />
+                    <p style="text-align: center; font-size: 18px;">Rating: ${recipe.ratings}</p>
+                    <p style="font-size: 16px;">${recipe.description}</p>
+                    <p style="font-size: 16px;">Ingredients: ${recipe.ingredients}</p>
+                    <p style="font-size: 16px;"><strong>Instructions:</strong></p>
+                    <ul style="font-size: 14px; padding-left: 20px; line-height: 1.6;">  
+                      ${recipe.instructions}
+                    </ul>
+                    <p style="font-size: 14px; text-align: center;">Explore more recipes on our website: <a href="http://example.com" style="color: #3498db; text-decoration: none;">Favour Fusion</a></p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+                    <p style="font-size: 12px; color: #888; text-align: center;">You received this email because you subscribed to our newsletter. If you wish to unsubscribe, <a href="#" style="color: #888; text-decoration: none;">click here</a>.</p>
+                  </div>
+                  `,
+                  
+      });
+  
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new Error('Error sending email');
+    }
+  }
+
+  app.post('/api/newsletter-signup', async (req, res) => {
+    const { name, email } = req.body;
+
+    try {
+        const existingUser = await Newsletter.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'You are already subscribed!' });
+        }
+
+        const newUser = new Newsletter({ username: name, email });
+        await newUser.save();
+        return res.status(201).json({ message: 'Signed up successfully!' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+  
+
+   
+ //present not using this in email use
+  // app.post('/api/newsletter-unsubscribe', async (req, res) => {
+  //   const { email } = req.body;
+  //   try {
+  //     const result = await Newsletter.findOneAndDelete({ email });
+  //     if (result) {
+  //       res.status(200).json({ message: 'Unsubscribed successfully' });
+  //     } else {
+  //       res.status(404).json({ error: 'Email not found' });
+  //     }
+  //   } catch (error) {
+  //     res.status(500).json({ error: 'Unsubscription failed' });
+  //   }
+  // });
+  
 
 app.listen(5000, () => {
     console.log("Server is running .....");

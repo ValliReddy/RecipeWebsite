@@ -7,10 +7,8 @@ const NewsletterUserSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
-    unique: true, 
+    required: true
   }
-  
 });
 
 module.exports = mongoose.model('NewsletterUserSchema', NewsletterUserSchema);

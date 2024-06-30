@@ -53,6 +53,7 @@ const MyProfile = () => {
   useEffect(() => {
     if (data) {
       setUserID(data._id);
+      // console.log(data._id)
 
     }
   }, [data]);
