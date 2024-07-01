@@ -67,3 +67,11 @@ body {
 .form label, .form input {
   color: #ffffff; /* Set text color to white */
 }
+
+@media (max-width: 768px) {
+  .form {
+    padding: 20px; /* Adjust padding for smaller screens */
+    margin-left: 10px; /* Add left margin */
+    margin-right: 10px; /* Add right margin */
+  }
+}

@@ -1,5 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Sriracha&display=swap');
 
+
+
+/*this for size for mobile */
+@media screen and (max-width: 480px) {
+  body, input, select, textarea,span{
+    font-size: 9pt; } }
+
+
+@media (max-width: 480px) {
+  .responsive-image {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .profile-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .user-recipe-img {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* Ensure padding around the container */
+  }
+
+  .profile-container, .menu-card {
+    margin: 0 auto; /* Center the content with equal margins */
+    padding: 0 20px; /* Ensure padding around the content */
+  }
+
+  .menu-card {
+    margin-bottom: 20px; /* Add gap between the menu-card and profile-container */
+  }
+}
+
+
 /* Add the following CSS to position #login-container on the right side */
 .new-userecipe-container {
   width: 200px;
@@ -214,6 +255,19 @@
   font-size: 1rem;
   outline: none;
   transition: all 200ms ease-in-out;
+}
+
+@media (max-width: 480px) {
+  .recipe {
+      padding: 8px 10px;
+      font-size: 8px;
+  }
+}
+@media (max-width: 480px) {
+  button {
+      padding: 8px 10px;
+      font-size: 8px;
+  }
 }
 .button.recipe:hover {
   background-color: #45a049;

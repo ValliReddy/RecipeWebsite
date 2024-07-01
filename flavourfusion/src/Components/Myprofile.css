@@ -1,10 +1,90 @@
+@media screen and (max-width: 480px) {
+  body, input, select, textarea {
+    font-size: 9pt; } }
+     #banner {
+      padding: 6em 0 4em 0 ;
+      display: -moz-flex;
+      display: -webkit-flex;
+      display: -ms-flex;
+      display: flex; }
+      #banner h1 {
+        margin-top: -0.125em; }
+      #banner .content {
+        -moz-flex-grow: 1;
+        -webkit-flex-grow: 1;
+        -ms-flex-grow: 1;
+        flex-grow: 1;
+        -moz-flex-shrink: 1;
+        -webkit-flex-shrink: 1;
+        -ms-flex-shrink: 1;
+        flex-shrink: 1;
+        width: 50%; }
+      #banner .image {
+        -moz-flex-grow: 0;
+        -webkit-flex-grow: 0;
+        -ms-flex-grow: 0;
+        flex-grow: 0;
+        -moz-flex-shrink: 0;
+        -webkit-flex-shrink: 0;
+        -ms-flex-shrink: 0;
+        flex-shrink: 0;
+        display: block;
+        margin: 0 0 2em 4em;
+        width: 50%; }
+        #banner .image img {
+          height: 100%;
+          -moz-object-fit: cover;
+          -webkit-object-fit: cover;
+          -ms-object-fit: cover;
+          object-fit: cover;
+          -moz-object-position: center;
+          -webkit-object-position: center;
+          -ms-object-position: center;
+          object-position: center;
+          width: 100%; } 
+      @media screen and (orientation: portrait) {
+        #banner {
+          -moz-flex-direction: column-reverse;
+          -webkit-flex-direction: column-reverse;
+          -ms-flex-direction: column-reverse;
+          flex-direction: column-reverse; }
+          #banner h1 br {
+            display: none; }
+          #banner .content {
+            -moz-flex-grow: 0;
+            -webkit-flex-grow: 0;
+            -ms-flex-grow: 0;
+            flex-grow: 0;
+            -moz-flex-shrink: 0;
+            -webkit-flex-shrink: 0;
+            -ms-flex-shrink: 0;
+            flex-shrink: 0;
+            width: 100%; }
+          #banner .image {
+            -moz-flex-grow: 0;
+            -webkit-flex-grow: 0;
+            -ms-flex-grow: 0;
+            flex-grow: 0;
+            -moz-flex-shrink: 0;
+            -webkit-flex-shrink: 0;
+            -ms-flex-shrink: 0;
+            flex-shrink: 0;
+            margin: 0 0 4em 0;
+            height: 25em;
+            max-height: 50vh;
+            min-height: 18em;
+            width: 100%; } }
+      @media screen and (orientation: portrait) and (max-width: 480px) {
+        #banner .image {
+          max-height: 35vh; } }
 
-#banner {
+  #banner {
     padding: 2em 0 2em 0 ;
     display: -moz-flex;
     display: -webkit-flex;
     display: -ms-flex;
-    display: flex; }
+    display: flex; }  
+  /*
     #banner h1 {
       margin-top: -0.125em; }
     #banner .content {
@@ -39,7 +119,7 @@
         -webkit-object-position: center;
         -ms-object-position: center;
         object-position: center;
-        width: 100%; }
+        width: 100%; }  */
 /* Posts */
 .posts {
     display: -moz-flex;
@@ -224,7 +304,7 @@
                     width: 100%; }
                     .features article .content > :last-child {
                       margin-bottom: 0; }
-                @media screen and (max-width: 980px) {
+                 @media screen and (max-width: 980px) {
                   .features {
                     margin: 0 0 2em 0;
                     width: 100%; }
@@ -248,8 +328,10 @@
                         .features article .icon:after {
                           height: 6em;
                           margin: -3em 0 0 -3em;
-                          width: 6em; } }
-                @media screen and (max-width: 480px) {
+                          width: 6em; } } 
+
+                          /*for followers ratings if want 2 in 1 row */
+                /* @media screen and (max-width: 480px) {
                   .features article {
                     -moz-flex-direction: column;
                     -webkit-flex-direction: column;
@@ -269,10 +351,13 @@
                       .features article .icon:after {
                         height: 4em;
                         margin: -2em 0 0 -2em;
-                        width: 4em; } }
-                @media screen and (max-width: 480px) {
+                        width: 4em; } } 
+                 @media screen and (max-width: 480px) {
                   .features article .icon:before {
-                    font-size: 1.25rem; } }
+                    font-size: 1.25rem; } } */
+
+
+
                     /* #main {
                         -moz-flex-grow: 1;
                         -webkit-flex-grow: 1;
@@ -342,22 +427,30 @@
                                   }
                                   
                                   /* styles.css or your main CSS file */
-                                .form-container {
-                                  background-color: #ffffff;
-                                  padding: 20px 20px; /* Decrease left and right padding */
-                                  border-radius: 2px;
-                                  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-                                  position: absolute;
-                                  max-width: 70%; /* Increase the max-width to 90% */
-                                  width: 40%; /* Ensure width is also increased */
-                                  height: 90%;
-                                  max-height: 90%;
-                                  overflow-y: auto;
-                                  margin: auto; /* Center the container */
-                                  /* top: 50%; Adjust top for better centering */
-                                  /* left: 50%; Adjust left for better centering */
-                                  /* transform: translate(-50%, -50%); Center align using transform */
+                                  .form-container {
+                                    background-color: #ffffff;
+                                    padding: 20px;
+                                    border-radius: 2px;
+                                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                                    position: absolute;
+                                    width: 90%;
+                                    max-width: 600px;
+                                    height: 90%;
+                                    max-height: 90%;
+                                    overflow-y: auto;
+                                    margin: auto;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
                                 }
+                                
+                                @media (max-width: 768px) {
+                                    .form-container {
+                                        width: 90%;
+                                        max-width: 90%;
+                                    }
+                                }
+                                
 
                                   
                                   .close-btn {
@@ -370,5 +463,11 @@
                                     font-size: 16px;
                                     color: #333333;
                                   }
+                                  @media (max-width: 992px) { /* Adjust max-width as per tablet breakpoint */
+                                    .card {
+                                        width: 100%;
+                                        max-width: none;
+                                    }
+                                }
                                                                 
                                   

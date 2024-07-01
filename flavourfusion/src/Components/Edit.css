@@ -156,3 +156,41 @@
         padding-left: 2rem !important;
     }
 }
+
+
+
+.edit-profile-container .col-xl-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-bottom: 1rem; /* Add margin between columns on mobile */
+}
+
+.edit-profile-container .col-xl-8 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-bottom: 1rem; /* Add margin between columns on mobile */
+}
+
+
+/*decrease size of buttons */
+@media (max-width: 480px) {
+    .btn.btn-primary {
+        padding: 8px 8px;
+        font-size: 8px; /* Adjusted font size for readability */
+    }
+}
+
+
+
+
+

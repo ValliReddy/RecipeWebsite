@@ -60,8 +60,8 @@ const RecipeForm = ({ open, userID, setCloseForm, recipeToEdit }) => {
     return (
         <>
             {open && (
-                <div className="card" style={{ width: '100%', maxWidth: '600px', margin: 'auto' }}>
-                    <div className="card-body">
+                <div className="card">
+                <div className="card-body" >
                         <h5 className="card-title">{recipeToEdit ? 'Edit Recipe' : 'Submit Your Recipe'}</h5>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
