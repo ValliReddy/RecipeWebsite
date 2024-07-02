@@ -182,15 +182,5 @@
 }
 
 
-/*decrease size of buttons */
-@media (max-width: 480px) {
-    .btn.btn-primary {
-        padding: 8px 8px;
-        font-size: 8px; /* Adjusted font size for readability */
-    }
-}
-
-
-
 
 

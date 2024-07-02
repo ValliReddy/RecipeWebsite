@@ -126,7 +126,7 @@ const EditProfile = () => {
                                         />
                                     </div>
                                 </div>
-                                <button className="btn btn-primary" type="submit">Save Changes</button>
+                                <button type="submit">Save Changes</button>
                             </form>
                         </div>
                     </div>
