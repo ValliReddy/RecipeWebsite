@@ -88,7 +88,7 @@ const RecipeForm = ({ open, userID, setCloseForm, recipeToEdit }) => {
                                 />
                             </div>
                             <div className="mb-3">
-                                <label htmlFor="ingredients" className="form-label">Ingredients:</label>
+                                <label htmlFor="ingredients" className="form-label">Ingredients:(Eg format :1 1/2 cups flour)</label>
                                 <textarea
                                     id="ingredients"
                                     className="form-control"

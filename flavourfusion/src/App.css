@@ -1,5 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Sriracha&display=swap');
 
+/* Base styles */
+.nutrition-info {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  background-color: #E7D4B5; /* Light green background color */
+  border-radius: 10px; /* Rounded corners */
+  width: 100%; /* Ensures it takes full width of the parent */
+  box-sizing: border-box; /* Includes padding and border in width calculation */
+}
+
+.nutrition-table {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Distribute items evenly */
+}
+
+.nutrition-item {
+  width: calc(33.33% - 10px); /* Three items per row with margin */
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  box-sizing: border-box;
+  border-radius: 8px; /* Slightly rounded corners */
+  background-color: white; /* Inner box background color */
+  overflow: hidden; /* Hides any overflowing content */
+}
+
+/* Responsive adjustments */
+@media only screen and (max-width: 768px) {
+  .nutrition-item {
+      width: calc(50% - 10px); /* Two items per row with margin */
+  }
+
+  .nutrition-item h8 {
+      font-size: 12px; /* Decrease font size for smaller screens */
+  }
+}
+
+
 
 
 /*this for size for mobile */

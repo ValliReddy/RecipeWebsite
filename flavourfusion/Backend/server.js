@@ -12,6 +12,8 @@ const middleware = require('./middleware');
 require('dotenv').config();
 const Newsletter=require('./models/NewsletterSchema');
 const cron = require('node-cron');
+const bodyParser = require('body-parser');
+const axios = require('axios');
 
 
 const RegisterUser = require('./models/RegisterUser');
@@ -22,6 +24,9 @@ const EditProfile = require('./models/EditSchema');
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*" }));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -608,6 +613,44 @@ app.post('/editprofile/update-ratings', async (req, res) => {
   //   }
   // });
   
+  app.post('/api/nutrition', async (req, res) => {
+    const { ingredients } = req.body; // Assuming ingredients are sent as { "ingredients": ["ingredient1", "ingredient2", ...] }
+    
+    const appId = process.env.EDAMAM_APP_ID;
+    const appKey = process.env.EDAMAM_APP_KEY;
+
+    if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
+        return res.status(400).json({ error: 'Ingredients parameter is required as a non-empty array in the request body' });
+    }
+
+    const endpoint = `https://api.edamam.com/api/nutrition-details?app_id=${appId}&app_key=${appKey}`;
+
+    // Create the request body in the expected format
+    const requestBody = {
+        title: "Recipe", // or any title you prefer
+        ingr: ingredients
+    };
+
+    console.log(`Fetching nutritional data from URL: ${endpoint}`);
+
+    try {
+        const response = await axios.post(endpoint, requestBody, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching nutritional data:', error.message);
+        if (error.response) {
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+        }
+        res.status(500).json({ error: 'Failed to fetch nutritional data' });
+    }
+});
+
+
 
 app.listen(5000, () => {
     console.log("Server is running .....");

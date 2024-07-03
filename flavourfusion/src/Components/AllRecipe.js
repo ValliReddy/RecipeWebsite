@@ -18,6 +18,8 @@ const All = () => {
   const [error, setError] = useState(null);
   const [authorID, setAuthorID] = useState(null);
   const [userRecipes, setUserRecipes] = useState([]);
+  const [nutritionData, setNutritionData] = useState(null);
+  const [ingredients, setIngredients] = useState('');
   const [profileData, setProfileData] = useState({
     username: '',
     followers: '',
@@ -45,6 +47,8 @@ const All = () => {
       const response = await axios.get(`http://localhost:5000/recipes/${recipeID}`);
       setRecipe(response.data);
       setAuthorID(response.data.Author);
+      setIngredients(response.data.ingredients)
+      console.log(response.data.ingredients)
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -147,6 +151,7 @@ const All = () => {
       try {
         const recipesResponse = await axios.get(`http://localhost:5000/recipes/user/${authorID}`);
         setUserRecipes(recipesResponse.data);
+        
       } catch (error) {
         console.error("Error fetching user recipes:", error);
       }
@@ -173,7 +178,24 @@ const All = () => {
   if (!recipe) {
     return <p><center><h4>No recipe found</h4></center></p>;
   }
+  const handleGenerateNutrition = async () => {
+    setLoading(true);
 
+    // Split the ingredients input into an array based on new lines
+    const ingredientsArray = ingredients.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    try {
+        const response = await axios.post('http://localhost:5000/api/nutrition', {
+            ingredients: ingredientsArray
+        });
+        setNutritionData(response.data);
+        // console.log(response.data)
+        setLoading(false);
+    } catch (error) {
+        setError(error.message);
+        setLoading(false);
+    }
+};
   return (
     <div className="container" style={{justifyContent:'center',alignContent:'center'}}>
       <div className="menu-card">
@@ -201,7 +223,33 @@ const All = () => {
         <div className="recipe-actions">
           <button className="recipe" onClick={handlePrint}>
             Print Recipe
-          </button>
+            </button>
+            <button onClick={handleGenerateNutrition} disabled={!ingredients.trim() || loading}>
+        {loading ? 'Generating...' : 'Generate Nutritional Facts'}
+      </button>
+
+      {error && <p>Error: {error}</p>}
+      {nutritionData && (
+    <div className="nutrition-info">
+        <h2>Nutritional Facts</h2>
+        <h8 style={{ fontWeight: 'bold' }}>Calories: {nutritionData.calories.toFixed(2)}</h8>
+        <div className="nutrition-table">
+            {Object.keys(nutritionData.totalDaily)
+                .filter(key => !['THIA', 'RIBF', 'FOLDFE', 'NIA'].includes(key)) // Exclude specific keys
+                .map(key => (
+                    <div className="nutrition-item" key={key}>
+                        <span style={{ fontWeight: 'bold', color: '#A0937D' }}>{nutritionData.totalDaily[key].label}:</span>
+                        <span style={{ color: '#A0937D' }}>{nutritionData.totalDaily[key].quantity.toFixed(2)}{nutritionData.totalDaily[key].unit}</span>
+                    </div>
+                ))}
+        </div>
+    </div>
+)}
+
+
+
+
+
           <h2>Leave a comment</h2>
            <CommentSection setAverageRating={setAverageRating} />   {/*imp for passing set of variable to other componenet instead of varaible */}
         </div>
