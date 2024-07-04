@@ -631,7 +631,7 @@ app.post('/editprofile/update-ratings', async (req, res) => {
         ingr: ingredients
     };
 
-    console.log(`Fetching nutritional data from URL: ${endpoint}`);
+    // console.log(`Fetching nutritional data from URL: ${endpoint}`);
 
     try {
         const response = await axios.post(endpoint, requestBody, {
@@ -650,8 +650,71 @@ app.post('/editprofile/update-ratings', async (req, res) => {
     }
 });
 
-
-
+const api = axios.create({
+    baseURL: 'https://api.spoonacular.com',
+    params: {
+      apiKey: process.env.SPOONACULAR_API_KEY
+    }
+  });
+  
+  // Endpoint to generate meal plan
+  app.get('/generateMealPlan', async (req, res) => {
+    try {
+      const {
+        targetCalories,
+        diet,
+        timeFrame,
+        exclude,
+        targetProtein,
+        targetFat,
+        targetCarbs,
+        includeBreakfast,
+        includeLunch,
+        includeDinner,
+        includeSnack,
+        allergies,
+        type,
+        cuisine,
+        targetCaloriesMin,
+        targetCaloriesMax,
+        number
+      } = req.query;
+  
+      // Prepare parameters for the request
+      const params = {
+        timeFrame: timeFrame || 'day',
+        targetCalories: targetCalories || 2000,
+        diet: diet || '',
+        exclude: exclude || '',
+        targetProtein: targetProtein || '',
+        targetFat: targetFat || '',
+        targetCarbs: targetCarbs || '',
+        includeBreakfast: includeBreakfast === 'true',
+        includeLunch: includeLunch === 'true',
+        includeDinner: includeDinner === 'true',
+        includeSnack: includeSnack === 'true',
+        allergies: allergies || '',
+        type: type || '',
+        cuisine: cuisine || '',
+        targetCaloriesMin: targetCaloriesMin || '',
+        targetCaloriesMax: targetCaloriesMax || '',
+        number: number || 3 // Default to 3 recipes
+      };
+  
+      // Make the API request using the Axios instance
+      const response = await api.get('/mealplanner/generate', { params });
+  
+      // Log parameters and send response data
+      console.log('Request Parameters:', params);
+      res.json(response.data);
+    } catch (error) {
+      // Handle errors
+      console.error('Failed to generate meal plan:', error.message);
+      res.status(500).json({ error: 'Failed to generate meal plan' });
+    }
+  });
+  
 app.listen(5000, () => {
     console.log("Server is running .....");
+   
 });

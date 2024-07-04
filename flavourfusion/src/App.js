@@ -14,6 +14,7 @@ import Newsletter from './Components/Newsletter';
 // import MyprofileNew from './Components/new';
 import ForgotPasswordForm from './Components/ForgotPassword';
 import ResetPasswordForm from './Components/ResetPassword';
+import MealPlanner from './Components/MealPlan';
 export const store = createContext();
 export const SearchContext = createContext();
 export const RecipeContext = createContext();
@@ -52,6 +53,7 @@ const App = () => {
               <Route path="/reset-password" element={<ResetPasswordForm/>} />
               <Route path="/news-letter" element={<Newsletter/>} />
               {/* <Route path="/newprofile" element={<MyprofileNew/>} /> */}
+              <Route path="/meal-planner" element={<MealPlanner/>} />
             </Routes>
             <Footer />
            </SearchContext.Provider>
