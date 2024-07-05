@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Notification from './Notification';
 
+
 const Footer = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
 	const [notificationKey, setNotificationKey] = useState(0);
+   
 
     const handleSubmit = async (e) => {
         e.preventDefault();

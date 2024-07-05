@@ -48,7 +48,7 @@ const All = () => {
       setRecipe(response.data);
       setAuthorID(response.data.Author);
       setIngredients(response.data.ingredients)
-      console.log(response.data.ingredients)
+      // console.log(response.data.ingredients)
       setLoading(false);
     } catch (error) {
       setError(error.message);

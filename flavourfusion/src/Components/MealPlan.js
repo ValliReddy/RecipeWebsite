@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 const MealPlanner = () => {
   const [mealPlan, setMealPlan] = useState(null);
+  const mealLabels = ["Breakfast", "Lunch", "Dinner"];
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     targetCalories: 2000,
@@ -61,7 +62,7 @@ const MealPlanner = () => {
           <h1 style={{ color: '#DA7297' }} className="custom-h1">Enjoy balanced, nutritious meals with our daily meal planner.</h1>
           <p className="custom-p">"Enjoy balanced, nutritious meals effortlessly with our daily meal planner. Take the guesswork out of planning and discover delicious recipes tailored to your preferences, ensuring every meal is both healthy and satisfying."</p>
     </header>
-    <div className="edit-profile-container container-xl px-4 mt-4">
+    <div className="menu-card">
       <div className="edit-card card mb-4">
         <div className="card-header">
          <div className="card-body">
@@ -190,24 +191,27 @@ const MealPlanner = () => {
           <div>
             <h2>Meal Details:</h2>
             <section className="tiles">
-            {mealPlan.meals.map((meal) => (
-              <article key={meal.id} className="style1">
-                <span className="image square-image">
-                  <img
-                    src={`https://spoonacular.com/recipeImages/${meal.id}-556x370.${meal.imageType}`}
-                    alt={meal.title}
-                  />
-                </span>
-                <Link to={meal.sourceUrl} target="_blank" rel="noopener noreferrer">
-                  <h2>{meal.title}</h2>
-                  <div className="content">
-                    <p>Ready in: {meal.readyInMinutes} minutes</p>
-                    <p>Servings: {meal.servings}</p>
-                    {/* <p>Recipe by <strong style={{ textTransform: 'capitalize' }}>Author Name</strong></p> */}
-                  </div>
-                </Link>
-              </article>
-            ))}
+            {mealPlan.meals.map((meal, index) => (
+  <article key={meal.id} className="style1">
+    <div className="image-container">
+     <center><h4 className="meal-label">{mealLabels[index]}</h4></center>
+      <span className="image square-image">
+        <img
+          src={`https://spoonacular.com/recipeImages/${meal.id}-556x370.${meal.imageType}`}
+          alt={meal.title}
+        />
+      </span>
+    </div>
+    <Link to={meal.sourceUrl} target="_blank" rel="noopener noreferrer">
+      <h2>{meal.title}</h2>
+      <div className="content">
+        <p>Ready in: {meal.readyInMinutes} minutes</p>
+        <p>Servings: {meal.servings}</p>
+        {/* <p>Recipe by <strong style={{ textTransform: 'capitalize' }}>Author Name</strong></p> */}
+      </div>
+    </Link>
+  </article>
+))}
           </section>
 
             {/* <ul>
