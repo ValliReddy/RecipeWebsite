@@ -19,7 +19,7 @@ const MainContent = () => {
       try {
         const response = await axios.get('http://localhost:5000/recipes');
         setRecipes(response.data);
-        console.log(response.data)
+        // console.log(response.data)
         setFilteredRecipes(response.data); // Initialize with all recipes
       } catch (error) {
         console.error('Error fetching recipes:', error);

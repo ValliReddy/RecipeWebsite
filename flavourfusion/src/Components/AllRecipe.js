@@ -37,6 +37,9 @@ const All = () => {
   const [followButtonDisabled, setFollowButtonDisabled] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [scaleFactor, setScaleFactor] = useState(1);
+  const [originalIngredients, setOriginalIngredients] = useState();
+  const [recipeIngredients, setRecipeIngredients] = useState();
 
   const toggleAccordion = () => {
     setIsActive(!isActive);
@@ -49,6 +52,17 @@ const All = () => {
       setAuthorID(response.data.Author);
       setIngredients(response.data.ingredients)
       // console.log(response.data.ingredients)
+      if (response.data && response.data.ingredients) {
+        const fetchedRecipe = response.data;
+        const ingredientsArray2 = fetchedRecipe.ingredients.split('\r\n');
+        setRecipeIngredients(ingredientsArray2);
+        setOriginalIngredients(ingredientsArray2);
+        setLoading(false);
+      } else {
+        setError('Invalid data received from server');
+        setLoading(false);
+        console.error('Response data or ingredients array is undefined:', response.data);
+      }
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -183,7 +197,6 @@ const All = () => {
 
     // Split the ingredients input into an array based on new lines
     const ingredientsArray = ingredients.split('\n').map(line => line.trim()).filter(line => line !== '');
-
     try {
         const response = await axios.post('http://localhost:5000/api/nutrition', {
             ingredients: ingredientsArray
@@ -196,6 +209,49 @@ const All = () => {
         setLoading(false);
     }
 };
+
+const adjustQuantities = (factor) => {
+  console.log(originalIngredients)
+  if (factor !== scaleFactor) {
+    const adjustedIngredients = originalIngredients.map((ingredient) => {
+      const regex = /^([\d./]+)\s/;
+      const match = ingredient.match(regex);
+
+      if (match) {
+        let quantity = match[1];
+        quantity = evaluateFraction(quantity);
+        let adjustedValue = quantity;
+
+        if (factor === 0.5) {
+          adjustedValue = Math.ceil(quantity / 2);
+        } else if (factor === 2) {
+          adjustedValue = quantity * 2;
+        }
+
+        if (factor === 1) {
+          adjustedValue = quantity;
+        }
+
+        ingredient = ingredient.replace(regex, adjustedValue + ' ');
+      }
+
+      return ingredient;
+    });
+
+    setRecipeIngredients(adjustedIngredients);
+    setScaleFactor(factor);
+  }
+};
+
+const evaluateFraction = (fraction) => {
+  if (fraction.includes('/')) {
+    const [numerator, denominator] = fraction.split('/');
+    return parseFloat(numerator) / parseFloat(denominator);
+  } else {
+    return parseFloat(fraction);
+  }
+};
+
   return (
     <div className="container" style={{justifyContent:'center',alignContent:'center'}}>
       <div className="menu-card">
@@ -206,9 +262,20 @@ const All = () => {
               <center><img src={recipe.imagePath} alt="Recipe Image" style={{ width: '50%', maxWidth: '700px' }} onError={(e) => console.log('Image Error:', e)} /></center>
             </span>
             <h2 style={{ textAlign: 'left' }}>{renderStars(averageRating)}</h2>
+            <div style={{ textAlign: 'right' }}>
+        <button onClick={() => adjustQuantities(0.5)} disabled={scaleFactor === 0.5}>
+          1/2x
+        </button>
+        <button onClick={() => adjustQuantities(1)} disabled={scaleFactor === 1}>
+          1x
+        </button>
+        <button onClick={() => adjustQuantities(2)} disabled={scaleFactor === 2}>
+          2x
+        </button>
+      </div>
             <h2>Ingredients:</h2>
             <ul>
-              {recipe.ingredients.split('\r\n').map((ingredient, index) => (
+              {recipeIngredients.map((ingredient, index) => (
                 <li key={index}>{ingredient}</li>
               ))}
             </ul>
